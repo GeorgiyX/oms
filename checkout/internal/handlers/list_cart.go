@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-
 	"route256/checkout/internal/model"
 )
 

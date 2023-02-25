@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-
 	"route256/checkout/internal/clients/http/loms"
 	productService "route256/checkout/internal/clients/http/product_service"
 	"route256/checkout/internal/model"

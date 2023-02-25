@@ -50,7 +50,7 @@ func (w *Wrapper[Req, Res]) ServeHTTP(resWriter http.ResponseWriter, httpReq *ht
 		return
 	}
 
-	if validator.Validate(request) {
+	if !validator.Validate(request) {
 		errors.WriteHttpError(validationErr, resWriter)
 		return
 	}

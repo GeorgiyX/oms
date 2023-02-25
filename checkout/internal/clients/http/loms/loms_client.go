@@ -3,10 +3,10 @@ package loms
 import (
 	"context"
 	"net/http"
-
-	"github.com/pkg/errors"
 	"route256/checkout/internal/model"
 	"route256/libs/httpaux"
+
+	"github.com/pkg/errors"
 )
 
 var _ StocksChecker = (*clientLOMS)(nil)
@@ -39,10 +39,7 @@ func (c *clientLOMS) Stocks(ctx context.Context, sku uint32) ([]model.Stock, err
 
 	stocks := make([]model.Stock, 0, len(response.Stocks))
 	for _, stock := range response.Stocks {
-		stocks = append(stocks, model.Stock{
-			WarehouseID: stock.WarehouseID,
-			Count:       stock.Count,
-		})
+		stocks = append(stocks, model.Stock(stock))
 	}
 
 	return stocks, nil
@@ -54,10 +51,7 @@ func (c *clientLOMS) CreateOrder(ctx context.Context, user int64, items []model.
 		Items: make([]model.CreateOrderRequestItem, 0, len(items)),
 	}
 	for _, item := range items {
-		request.Items = append(request.Items, model.CreateOrderRequestItem{
-			SKU:   item.SKU,
-			Count: item.Count,
-		})
+		request.Items = append(request.Items, model.CreateOrderRequestItem(item))
 	}
 
 	response, err := httpaux.Request[model.CreateOrderRequest, model.CreateOrderResponse](ctx, http.MethodPost, c.urlCreateOrder, request)

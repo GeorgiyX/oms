@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"route256/checkout/internal/clients/http/product_service"
-	"route256/checkout/internal/handlers"
-
 	"route256/checkout/internal/clients/http/loms"
+	"route256/checkout/internal/clients/http/product_service"
 	"route256/checkout/internal/config"
+	"route256/checkout/internal/handlers"
 	"route256/checkout/internal/usecase"
 	"route256/libs/httpaux"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func main() {

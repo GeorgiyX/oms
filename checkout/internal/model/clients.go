@@ -19,7 +19,8 @@ type Stock struct {
 }
 
 type ProductRequest struct {
-	SKU uint32 `json:"sku"`
+	Token string `json:"token"`
+	SKU   uint32 `json:"sku"`
 }
 
 type ProductResponse struct {
@@ -38,8 +39,8 @@ type CreateOrderItem struct {
 }
 
 type CreateOrderRequestItem struct {
-	SKU   uint32
-	Count uint16
+	SKU   uint32 `json:"sku"`
+	Count uint16 `json:"count"`
 }
 
 type CreateOrderRequest struct {

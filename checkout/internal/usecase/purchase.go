@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
+	"route256/checkout/internal/model"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/pkg/errors"
-	"route256/checkout/internal/model"
 )
 
 var cartItems = []model.CreateOrderItem{
