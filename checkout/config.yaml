@@ -1,0 +1,4 @@
+token: "test"
+services:
+  checkout: ":8081"
+  loms: "loms:8081"
