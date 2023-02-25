@@ -5,11 +5,11 @@ import (
 )
 
 type Handler struct {
-	businessLogic usecase.UseCase
+	useCase usecase.UseCase
 }
 
 func New(businessLogic usecase.UseCase) *Handler {
 	return &Handler{
-		businessLogic: businessLogic,
+		useCase: businessLogic,
 	}
 }

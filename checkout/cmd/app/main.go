@@ -25,10 +25,10 @@ func main() {
 
 	router := httprouter.New()
 	router.Handler(http.MethodPost, "/handlerInstance", httpaux.New(handlerInstance.AddToCart))
-	router.Handler(http.MethodPost, "/deleteFromCart", httpaux.New(handlerInstance.DeleteFromCart))
+	router.Handler(http.MethodDelete, "/deleteFromCart", httpaux.New(handlerInstance.DeleteFromCart))
 	router.Handler(http.MethodPost, "/listCart", httpaux.New(handlerInstance.ListCart))
 	router.Handler(http.MethodPost, "/purchase", httpaux.New(handlerInstance.Purchase))
 
-	log.Printf("start checkout service at %s\n", config.Instance.Services.Checkout)
+	log.Printf("start \"checkout\" service at %s\n", config.Instance.Services.Checkout)
 	log.Fatal(http.ListenAndServe(config.Instance.Services.Checkout, router))
 }

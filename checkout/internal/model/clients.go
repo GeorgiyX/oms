@@ -23,11 +23,30 @@ type ProductRequest struct {
 }
 
 type ProductResponse struct {
-	Name  string  `json:"name"`
-	Price float64 `json:"price"`
+	Name  string `json:"name"`
+	Price uint32 `json:"price"`
 }
 
 type Product struct {
 	Name  string
-	Price float64
+	Price uint32
+}
+
+type CreateOrderItem struct {
+	SKU   uint32
+	Count uint16
+}
+
+type CreateOrderRequestItem struct {
+	SKU   uint32
+	Count uint16
+}
+
+type CreateOrderRequest struct {
+	User  int64                    `json:"user"`
+	Items []CreateOrderRequestItem `json:"items"`
+}
+
+type CreateOrderResponse struct {
+	OrderID int64 `json:"orderID"`
 }

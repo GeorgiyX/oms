@@ -31,7 +31,7 @@ func (c *clientSkuResolver) Resolve(ctx context.Context, sku uint32) (*model.Pro
 	request := model.ProductRequest{SKU: sku}
 	response, err := httpaux.Request[model.ProductRequest, model.ProductResponse](ctx, http.MethodPost, c.urlGetProduct, request)
 	if err != nil {
-		return nil, errors.Wrap(err, "product client")
+		return nil, errors.Wrap(err, "product client Resolve")
 	}
 
 	return &model.Product{

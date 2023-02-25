@@ -7,6 +7,6 @@ import (
 )
 
 func (h *Handler) AddToCart(ctx context.Context, req model.AddToCartRequest) (response *model.AddToCartResponse, err error) {
-	err = h.businessLogic.AddToCart(ctx, req.User, req.Sku, req.Count)
+	err = h.useCase.AddToCart(ctx, req.User, req.Sku, req.Count)
 	return
 }

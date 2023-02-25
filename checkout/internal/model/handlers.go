@@ -38,6 +38,6 @@ type CartItemResponse struct {
 }
 
 type CartResponse struct {
-	Items      []*CartItem `json:"items"`
-	TotalPrice uint32      `json:"totalPrice"`
+	Items      []*CartItemResponse `json:"items"`
+	TotalPrice uint32              `json:"totalPrice"`
 }
