@@ -1,75 +1,42 @@
 package loms
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"route256/checkout/internal/domain"
 
 	"github.com/pkg/errors"
+	"route256/checkout/internal/model"
+	"route256/libs/httpaux"
 )
 
-type Client struct {
-	url string
+var _ StocksChecker = (*clientLOMS)(nil)
 
+type StocksChecker interface {
+	Stocks(ctx context.Context, sku uint32) ([]model.Stock, error)
+}
+
+type clientLOMS struct {
+	url       string
 	urlStocks string
 }
 
-func New(url string) *Client {
-	return &Client{
-		url: url,
-
+func New(url string) *clientLOMS {
+	return &clientLOMS{
+		url:       url,
 		urlStocks: url + "/stocks",
 	}
 }
 
-type StocksRequest struct {
-	SKU uint32 `json:"sku"`
-}
-
-type StocksItem struct {
-	WarehouseID int64  `json:"warehouseID"`
-	Count       uint64 `json:"count"`
-}
-
-type StocksResponse struct {
-	Stocks []StocksItem `json:"stocks"`
-}
-
-func (c *Client) Stocks(ctx context.Context, sku uint32) ([]domain.Stock, error) {
-	request := StocksRequest{SKU: sku}
-
-	rawJSON, err := json.Marshal(request)
+func (c *clientLOMS) Stocks(ctx context.Context, sku uint32) ([]model.Stock, error) {
+	request := model.StocksRequest{SKU: sku}
+	response, err := httpaux.Request[model.StocksRequest, model.StocksResponse](ctx, http.MethodPost, c.urlStocks, request)
 	if err != nil {
-		return nil, errors.Wrap(err, "marshaling json")
+		return nil, errors.Wrap(err, "stock client")
 	}
 
-	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodPost, c.urlStocks, bytes.NewBuffer(rawJSON))
-	if err != nil {
-		return nil, errors.Wrap(err, "creating http request")
-	}
-
-	httpResponse, err := http.DefaultClient.Do(httpRequest)
-	if err != nil {
-		return nil, errors.Wrap(err, "calling http")
-	}
-	defer httpResponse.Body.Close()
-
-	if httpResponse.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("wrong status code: %d", httpResponse.StatusCode)
-	}
-
-	var response StocksResponse
-	err = json.NewDecoder(httpResponse.Body).Decode(&response)
-	if err != nil {
-		return nil, errors.Wrap(err, "decoding json")
-	}
-
-	stocks := make([]domain.Stock, 0, len(response.Stocks))
+	stocks := make([]model.Stock, 0, len(response.Stocks))
 	for _, stock := range response.Stocks {
-		stocks = append(stocks, domain.Stock{
+		stocks = append(stocks, model.Stock{
 			WarehouseID: stock.WarehouseID,
 			Count:       stock.Count,
 		})

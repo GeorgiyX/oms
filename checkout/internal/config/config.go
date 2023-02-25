@@ -8,8 +8,9 @@ import (
 type Config struct {
 	Token    string `yaml:"token"`
 	Services struct {
-		Checkout string `yaml:"checkout"`
-		Loms     string `yaml:"loms"`
+		Checkout       string `yaml:"checkout"`
+		Loms           string `yaml:"loms"`
+		ProductService string `yaml:"product_service"`
 	} `yaml:"services"`
 }
 

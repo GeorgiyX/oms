@@ -1,4 +1,4 @@
-package srvwrapper
+package httpaux
 
 import (
 	"context"
@@ -28,12 +28,12 @@ var (
 	}
 )
 
-type Wrapper[Req, Res any] struct {
-	fn func(ctx context.Context, req Req) (Res, error)
+type Wrapper[Req, Resp any] struct {
+	fn func(ctx context.Context, req Req) (Resp, error)
 }
 
-func New[Req, Res any](fn func(ctx context.Context, req Req) (Res, error)) *Wrapper[Req, Res] {
-	return &Wrapper[Req, Res]{
+func New[Req, Resp any](fn func(ctx context.Context, req Req) (Resp, error)) *Wrapper[Req, Resp] {
+	return &Wrapper[Req, Resp]{
 		fn: fn,
 	}
 }
