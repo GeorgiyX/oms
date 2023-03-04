@@ -11,15 +11,15 @@ import (
 var cartItems = []model.CreateOrderItem{
 	{
 		SKU:   gofakeit.Uint32(),
-		Count: gofakeit.Uint16(),
+		Count: gofakeit.Uint32(),
 	},
 	{
 		SKU:   gofakeit.Uint32(),
-		Count: gofakeit.Uint16(),
+		Count: gofakeit.Uint32(),
 	},
 	{
 		SKU:   gofakeit.Uint32(),
-		Count: gofakeit.Uint16(),
+		Count: gofakeit.Uint32(),
 	},
 }
 

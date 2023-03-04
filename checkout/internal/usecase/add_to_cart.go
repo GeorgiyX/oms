@@ -10,7 +10,7 @@ var (
 	ErrInsufficientStocks = errors.New("insufficient stocks")
 )
 
-func (u *useCase) AddToCart(ctx context.Context, user int64, sku uint32, count uint16) error {
+func (u *useCase) AddToCart(ctx context.Context, user int64, sku uint32, count uint32) error {
 	stocks, err := u.stocksChecker.Stocks(ctx, sku)
 	if err != nil {
 		return errors.WithMessage(err, "checking stocks")
