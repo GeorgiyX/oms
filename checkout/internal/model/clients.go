@@ -15,7 +15,7 @@ type StocksResponse struct {
 
 type Stock struct {
 	WarehouseID int64
-	Count       uint32
+	Count       uint64
 }
 
 type ProductRequest struct {

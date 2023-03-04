@@ -11,7 +11,7 @@ const ordersSize = 5
 
 func (u *useCase) ListOrder(ctx context.Context, orderID int64) (model.Order, error) {
 	order := model.Order{
-		Status:  "new",
+		Status:  model.New,
 		User:    gofakeit.Int64(),
 		Items:   nil,
 		OrderID: gofakeit.Int64(),
@@ -20,7 +20,7 @@ func (u *useCase) ListOrder(ctx context.Context, orderID int64) (model.Order, er
 	for i := 0; i < warehousesCount; i++ {
 		order.Items = append(order.Items, model.OrderItem{
 			SKU:   gofakeit.Uint32(),
-			Count: gofakeit.Uint16(),
+			Count: gofakeit.Uint32(),
 		})
 	}
 	return order, nil

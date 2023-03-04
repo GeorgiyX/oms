@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
+	desc "route256/checkout/pkg/checkout"
 
 	"google.golang.org/protobuf/types/known/emptypb"
-	desc "route256/checkout/pkg/checkout"
 )
 
 func (h *Service) AddToCart(ctx context.Context, req *desc.AddToCartRequest) (*emptypb.Empty, error) {

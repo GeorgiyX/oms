@@ -1,10 +1,6 @@
 package main
 
 import (
-	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"route256/checkout/internal/clients/loms"
@@ -16,6 +12,11 @@ import (
 	descProductService "route256/checkout/pkg/product-service"
 	"route256/libs/middleware"
 	descLoms "route256/loms/pkg/loms"
+
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -46,7 +47,7 @@ func main() {
 
 	s := grpc.NewServer(
 		grpc.UnaryInterceptor(
-			grpc_middleware.ChainUnaryServer(
+			grpcMiddleware.ChainUnaryServer(
 				middleware.LoggingInterceptor,
 			),
 		),

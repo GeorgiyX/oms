@@ -2,28 +2,41 @@ package main
 
 import (
 	"log"
-	"net/http"
-	"route256/libs/httpaux"
+	"net"
+	"route256/libs/middleware"
 	"route256/loms/internal/config"
-	"route256/loms/internal/handlers"
+	"route256/loms/internal/service"
 	"route256/loms/internal/usecase"
+	desc "route256/loms/pkg/loms"
 
-	"github.com/julienschmidt/httprouter"
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
 	config.Init()
 
 	useCaseInstance := usecase.New()
-	handlerInstance := handlers.New(useCaseInstance)
+	serviceInstance := service.New(useCaseInstance)
 
-	router := httprouter.New()
-	router.Handler(http.MethodPost, "/createOrder", httpaux.New(handlerInstance.CreateOrder))
-	router.Handler(http.MethodPost, "/listOrder", httpaux.New(handlerInstance.ListOrder))
-	router.Handler(http.MethodPost, "/orderPayed", httpaux.New(handlerInstance.OrderPayed))
-	router.Handler(http.MethodPost, "/cancelOrder", httpaux.New(handlerInstance.CancelOrder))
-	router.Handler(http.MethodPost, "/stocks", httpaux.New(handlerInstance.Stock))
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			grpcMiddleware.ChainUnaryServer(
+				middleware.LoggingInterceptor,
+			),
+		),
+	)
+
+	reflection.Register(s)
+	desc.RegisterLomsServer(s, serviceInstance)
 
 	log.Printf("start \"loms\" service at %s\n", config.Instance.Services.Loms)
-	log.Fatal(http.ListenAndServe(config.Instance.Services.Loms, router))
+	lis, err := net.Listen("tcp", config.Instance.Services.Loms)
+	if err != nil {
+		log.Fatalf("create tcp listener: %v", err)
+	}
+	if err = s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }

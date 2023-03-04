@@ -2,11 +2,11 @@ package loms
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
 	"route256/checkout/internal/convert"
 	"route256/checkout/internal/model"
 	desc "route256/loms/pkg/loms"
+
+	"github.com/pkg/errors"
 )
 
 var _ StocksChecker = (*clientLOMS)(nil)
