@@ -1,5 +1,5 @@
-token: "---"
+token: "secret"
 services:
   checkout: ":8081"
   loms: "loms:8082"
-  product_service: "http://route256.pavl.uk:8080"
+  product_service: "route256.pavl.uk:8082"

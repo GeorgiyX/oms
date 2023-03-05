@@ -2,10 +2,10 @@ package product_service
 
 import (
 	"context"
-	"net/http"
 	"route256/checkout/internal/config"
+	"route256/checkout/internal/convert"
 	"route256/checkout/internal/model"
-	"route256/libs/httpaux"
+	desc "route256/checkout/pkg/product-service"
 
 	"github.com/pkg/errors"
 )
@@ -17,29 +17,23 @@ type SkuResolver interface {
 }
 
 type clientSkuResolver struct {
-	url           string
-	urlGetProduct string
+	client desc.ProductServiceClient
 }
 
-func New(url string) *clientSkuResolver {
+func New(client desc.ProductServiceClient) *clientSkuResolver {
 	return &clientSkuResolver{
-		url:           url,
-		urlGetProduct: url + "/get_product",
+		client: client,
 	}
 }
 
 func (c *clientSkuResolver) Resolve(ctx context.Context, sku uint32) (*model.Product, error) {
-	request := model.ProductRequest{
+	resp, err := c.client.GetProduct(ctx, &desc.GetProductRequest{
 		Token: config.Instance.Token,
-		SKU:   sku,
-	}
-	response, err := httpaux.Request[model.ProductRequest, model.ProductResponse](ctx, http.MethodPost, c.urlGetProduct, request)
+		Sku:   sku,
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, "product client Resolve")
 	}
 
-	return &model.Product{
-		Name:  response.Name,
-		Price: response.Price,
-	}, nil
+	return convert.ToProduct(resp), nil
 }

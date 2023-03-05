@@ -4,12 +4,16 @@ services:
     image: checkout
     build: ./checkout/
     ports:
-      - "8080:8080"
+      - "8081:8081"
+    volumes:
+      - ./checkout:/checkout # for config read
   loms:
     image: loms
     build: ./loms/
     ports:
-      - "8081:8081"
+      - "8082:8082"
+    volumes:
+      - ./loms:/loms  # for config read
   # notification:
   #   image: notification
   #   build: ./notification

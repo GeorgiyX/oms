@@ -31,7 +31,7 @@ func (u *useCase) ListCart(ctx context.Context, user int64) (model.Cart, error) 
 		}
 		cart.Items = append(cart.Items, &model.CartItem{
 			Sku:   sku,
-			Count: gofakeit.Uint16(),
+			Count: gofakeit.Uint32(),
 			Name:  product.Name,
 			Price: product.Price,
 		})

@@ -2,7 +2,7 @@ package model
 
 type CartItem struct {
 	Sku   uint32
-	Count uint16
+	Count uint32
 	Name  string
 	Price uint32
 }

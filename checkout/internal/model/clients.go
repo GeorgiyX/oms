@@ -35,12 +35,12 @@ type Product struct {
 
 type CreateOrderItem struct {
 	SKU   uint32
-	Count uint16
+	Count uint32
 }
 
 type CreateOrderRequestItem struct {
 	SKU   uint32 `json:"sku"`
-	Count uint16 `json:"count"`
+	Count uint32 `json:"count"`
 }
 
 type CreateOrderRequest struct {
