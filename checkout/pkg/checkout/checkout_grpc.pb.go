@@ -8,7 +8,6 @@ package checkout
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -20,7 +19,7 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// CheckoutClient is the client API for Checkout service.
+// CheckoutClient is the client API for Checkout checkout.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CheckoutClient interface {
@@ -74,7 +73,7 @@ func (c *checkoutClient) Purchase(ctx context.Context, in *PurchaseRequest, opts
 	return out, nil
 }
 
-// CheckoutServer is the server API for Checkout service.
+// CheckoutServer is the server API for Checkout checkout.
 // All implementations must embed UnimplementedCheckoutServer
 // for forward compatibility
 type CheckoutServer interface {
@@ -103,7 +102,7 @@ func (UnimplementedCheckoutServer) Purchase(context.Context, *PurchaseRequest) (
 }
 func (UnimplementedCheckoutServer) mustEmbedUnimplementedCheckoutServer() {}
 
-// UnsafeCheckoutServer may be embedded to opt out of forward compatibility for this service.
+// UnsafeCheckoutServer may be embedded to opt out of forward compatibility for this checkout.
 // Use of this interface is not recommended, as added methods to CheckoutServer will
 // result in compilation errors.
 type UnsafeCheckoutServer interface {
@@ -186,7 +185,7 @@ func _Checkout_Purchase_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-// Checkout_ServiceDesc is the grpc.ServiceDesc for Checkout service.
+// Checkout_ServiceDesc is the grpc.ServiceDesc for Checkout checkout.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Checkout_ServiceDesc = grpc.ServiceDesc{

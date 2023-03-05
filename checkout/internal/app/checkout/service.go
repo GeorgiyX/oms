@@ -1,12 +1,12 @@
-package service
+package checkout
 
 import (
-	"route256/loms/internal/usecase"
-	desc "route256/loms/pkg/loms"
+	"route256/checkout/internal/usecase"
+	desc "route256/checkout/pkg/checkout"
 )
 
 type Service struct {
-	desc.UnimplementedLomsServer
+	desc.UnimplementedCheckoutServer
 	useCase usecase.UseCase
 }
 

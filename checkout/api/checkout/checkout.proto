@@ -30,14 +30,14 @@ message ListCartRequest {
 }
 
 message ListCartResponse {
-  message CartItemResponse {
+  message CartItem {
     uint32 sku = 1;
     uint32 count = 2;
     string name = 3;
     uint32 price = 4;
   }
 
-  repeated CartItemResponse items = 1;
+  repeated CartItem items = 1;
   uint32  total_price = 2;
 }
 

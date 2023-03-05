@@ -2,13 +2,12 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: product-service.proto
+// source: product-checkout.proto
 
 package product
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,7 +18,7 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// ProductServiceClient is the client API for ProductService service.
+// ProductServiceClient is the client API for ProductService checkout.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProductServiceClient interface {
@@ -53,7 +52,7 @@ func (c *productServiceClient) ListSkus(ctx context.Context, in *ListSkusRequest
 	return out, nil
 }
 
-// ProductServiceServer is the server API for ProductService service.
+// ProductServiceServer is the server API for ProductService checkout.
 // All implementations must embed UnimplementedProductServiceServer
 // for forward compatibility
 type ProductServiceServer interface {
@@ -74,7 +73,7 @@ func (UnimplementedProductServiceServer) ListSkus(context.Context, *ListSkusRequ
 }
 func (UnimplementedProductServiceServer) mustEmbedUnimplementedProductServiceServer() {}
 
-// UnsafeProductServiceServer may be embedded to opt out of forward compatibility for this service.
+// UnsafeProductServiceServer may be embedded to opt out of forward compatibility for this checkout.
 // Use of this interface is not recommended, as added methods to ProductServiceServer will
 // result in compilation errors.
 type UnsafeProductServiceServer interface {
@@ -121,7 +120,7 @@ func _ProductService_ListSkus_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-// ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
+// ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService checkout.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ProductService_ServiceDesc = grpc.ServiceDesc{
@@ -138,5 +137,5 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "product-service.proto",
+	Metadata: "product-checkout.proto",
 }

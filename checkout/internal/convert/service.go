@@ -8,9 +8,9 @@ import (
 func ToCartResponse(cart model.Cart) *desc.ListCartResponse {
 	out := &desc.ListCartResponse{}
 	out.TotalPrice = cart.TotalPrice
-	out.Items = make([]*desc.ListCartResponse_CartItemResponse, 0, len(cart.Items))
+	out.Items = make([]*desc.ListCartResponse_CartItem, 0, len(cart.Items))
 	for _, item := range cart.Items {
-		out.Items = append(out.Items, &desc.ListCartResponse_CartItemResponse{
+		out.Items = append(out.Items, &desc.ListCartResponse_CartItem{
 			Sku:   item.Sku,
 			Count: item.Count,
 			Name:  item.Name,

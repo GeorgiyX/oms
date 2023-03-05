@@ -4,8 +4,8 @@ import (
 	"log"
 	"net"
 	"route256/libs/middleware"
+	"route256/loms/internal/app/loms"
 	"route256/loms/internal/config"
-	"route256/loms/internal/service"
 	"route256/loms/internal/usecase"
 	desc "route256/loms/pkg/loms"
 
@@ -18,7 +18,7 @@ func main() {
 	config.Init()
 
 	useCaseInstance := usecase.New()
-	serviceInstance := service.New(useCaseInstance)
+	serviceInstance := loms.New(useCaseInstance)
 
 	s := grpc.NewServer(
 		grpc.UnaryInterceptor(
@@ -31,7 +31,7 @@ func main() {
 	reflection.Register(s)
 	desc.RegisterLomsServer(s, serviceInstance)
 
-	log.Printf("start \"loms\" service at %s\n", config.Instance.Services.Loms)
+	log.Printf("start \"loms\" checkout at %s\n", config.Instance.Services.Loms)
 	lis, err := net.Listen("tcp", config.Instance.Services.Loms)
 	if err != nil {
 		log.Fatalf("create tcp listener: %v", err)

@@ -1,10 +1,10 @@
-package service
+package checkout
 
 import (
 	"context"
-	desc "route256/checkout/pkg/checkout"
 
 	"google.golang.org/protobuf/types/known/emptypb"
+	desc "route256/checkout/pkg/checkout"
 )
 
 func (h *Service) DeleteFromCart(ctx context.Context, req *desc.DeleteFromCartRequest) (*emptypb.Empty, error) {

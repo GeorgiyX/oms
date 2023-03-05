@@ -7,12 +7,11 @@
 package checkout
 
 import (
-	reflect "reflect"
-	sync "sync"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -200,8 +199,8 @@ type ListCartResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Items      []*ListCartResponse_CartItemResponse `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
-	TotalPrice uint32                               `protobuf:"varint,2,opt,name=total_price,json=totalPrice,proto3" json:"total_price,omitempty"`
+	Items      []*ListCartResponse_CartItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	TotalPrice uint32                       `protobuf:"varint,2,opt,name=total_price,json=totalPrice,proto3" json:"total_price,omitempty"`
 }
 
 func (x *ListCartResponse) Reset() {
@@ -236,7 +235,7 @@ func (*ListCartResponse) Descriptor() ([]byte, []int) {
 	return file_checkout_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *ListCartResponse) GetItems() []*ListCartResponse_CartItemResponse {
+func (x *ListCartResponse) GetItems() []*ListCartResponse_CartItem {
 	if x != nil {
 		return x.Items
 	}
@@ -344,7 +343,7 @@ func (x *PurchaseResponse) GetOrderId() int64 {
 	return 0
 }
 
-type ListCartResponse_CartItemResponse struct {
+type ListCartResponse_CartItem struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -355,8 +354,8 @@ type ListCartResponse_CartItemResponse struct {
 	Price uint32 `protobuf:"varint,4,opt,name=price,proto3" json:"price,omitempty"`
 }
 
-func (x *ListCartResponse_CartItemResponse) Reset() {
-	*x = ListCartResponse_CartItemResponse{}
+func (x *ListCartResponse_CartItem) Reset() {
+	*x = ListCartResponse_CartItem{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_checkout_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -364,13 +363,13 @@ func (x *ListCartResponse_CartItemResponse) Reset() {
 	}
 }
 
-func (x *ListCartResponse_CartItemResponse) String() string {
+func (x *ListCartResponse_CartItem) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListCartResponse_CartItemResponse) ProtoMessage() {}
+func (*ListCartResponse_CartItem) ProtoMessage() {}
 
-func (x *ListCartResponse_CartItemResponse) ProtoReflect() protoreflect.Message {
+func (x *ListCartResponse_CartItem) ProtoReflect() protoreflect.Message {
 	mi := &file_checkout_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -382,33 +381,33 @@ func (x *ListCartResponse_CartItemResponse) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListCartResponse_CartItemResponse.ProtoReflect.Descriptor instead.
-func (*ListCartResponse_CartItemResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListCartResponse_CartItem.ProtoReflect.Descriptor instead.
+func (*ListCartResponse_CartItem) Descriptor() ([]byte, []int) {
 	return file_checkout_proto_rawDescGZIP(), []int{3, 0}
 }
 
-func (x *ListCartResponse_CartItemResponse) GetSku() uint32 {
+func (x *ListCartResponse_CartItem) GetSku() uint32 {
 	if x != nil {
 		return x.Sku
 	}
 	return 0
 }
 
-func (x *ListCartResponse_CartItemResponse) GetCount() uint32 {
+func (x *ListCartResponse_CartItem) GetCount() uint32 {
 	if x != nil {
 		return x.Count
 	}
 	return 0
 }
 
-func (x *ListCartResponse_CartItemResponse) GetName() string {
+func (x *ListCartResponse_CartItem) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *ListCartResponse_CartItemResponse) GetPrice() uint32 {
+func (x *ListCartResponse_CartItem) GetPrice() uint32 {
 	if x != nil {
 		return x.Price
 	}
@@ -434,15 +433,14 @@ var file_checkout_proto_rawDesc = []byte{
 	0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x25, 0x0a, 0x0f,
 	0x4c, 0x69, 0x73, 0x74, 0x43, 0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
 	0x12, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x04, 0x75,
-	0x73, 0x65, 0x72, 0x22, 0xdc, 0x01, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x61, 0x72, 0x74,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41, 0x0a, 0x05, 0x69, 0x74, 0x65, 0x6d,
-	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2b, 0x2e, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x6f,
+	0x73, 0x65, 0x72, 0x22, 0xcc, 0x01, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x61, 0x72, 0x74,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x39, 0x0a, 0x05, 0x69, 0x74, 0x65, 0x6d,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x6f,
 	0x75, 0x74, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x43, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x2e, 0x43, 0x61, 0x72, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x52, 0x05, 0x69, 0x74, 0x65, 0x6d, 0x73, 0x12, 0x1f, 0x0a, 0x0b, 0x74,
-	0x6f, 0x74, 0x61, 0x6c, 0x5f, 0x70, 0x72, 0x69, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d,
-	0x52, 0x0a, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x50, 0x72, 0x69, 0x63, 0x65, 0x1a, 0x64, 0x0a, 0x10,
-	0x43, 0x61, 0x72, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x6e, 0x73, 0x65, 0x2e, 0x43, 0x61, 0x72, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x05, 0x69, 0x74,
+	0x65, 0x6d, 0x73, 0x12, 0x1f, 0x0a, 0x0b, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x5f, 0x70, 0x72, 0x69,
+	0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0a, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x50,
+	0x72, 0x69, 0x63, 0x65, 0x1a, 0x5c, 0x0a, 0x08, 0x43, 0x61, 0x72, 0x74, 0x49, 0x74, 0x65, 0x6d,
 	0x12, 0x10, 0x0a, 0x03, 0x73, 0x6b, 0x75, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x03, 0x73,
 	0x6b, 0x75, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28,
 	0x0d, 0x52, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
@@ -491,17 +489,17 @@ func file_checkout_proto_rawDescGZIP() []byte {
 
 var file_checkout_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_checkout_proto_goTypes = []interface{}{
-	(*AddToCartRequest)(nil),                  // 0: checkout.AddToCartRequest
-	(*DeleteFromCartRequest)(nil),             // 1: checkout.DeleteFromCartRequest
-	(*ListCartRequest)(nil),                   // 2: checkout.ListCartRequest
-	(*ListCartResponse)(nil),                  // 3: checkout.ListCartResponse
-	(*PurchaseRequest)(nil),                   // 4: checkout.PurchaseRequest
-	(*PurchaseResponse)(nil),                  // 5: checkout.PurchaseResponse
-	(*ListCartResponse_CartItemResponse)(nil), // 6: checkout.ListCartResponse.CartItemResponse
-	(*emptypb.Empty)(nil),                     // 7: google.protobuf.Empty
+	(*AddToCartRequest)(nil),          // 0: checkout.AddToCartRequest
+	(*DeleteFromCartRequest)(nil),     // 1: checkout.DeleteFromCartRequest
+	(*ListCartRequest)(nil),           // 2: checkout.ListCartRequest
+	(*ListCartResponse)(nil),          // 3: checkout.ListCartResponse
+	(*PurchaseRequest)(nil),           // 4: checkout.PurchaseRequest
+	(*PurchaseResponse)(nil),          // 5: checkout.PurchaseResponse
+	(*ListCartResponse_CartItem)(nil), // 6: checkout.ListCartResponse.CartItem
+	(*emptypb.Empty)(nil),             // 7: google.protobuf.Empty
 }
 var file_checkout_proto_depIdxs = []int32{
-	6, // 0: checkout.ListCartResponse.items:type_name -> checkout.ListCartResponse.CartItemResponse
+	6, // 0: checkout.ListCartResponse.items:type_name -> checkout.ListCartResponse.CartItem
 	0, // 1: checkout.Checkout.AddToCart:input_type -> checkout.AddToCartRequest
 	1, // 2: checkout.Checkout.DeleteFromCart:input_type -> checkout.DeleteFromCartRequest
 	2, // 3: checkout.Checkout.ListCart:input_type -> checkout.ListCartRequest
@@ -596,7 +594,7 @@ func file_checkout_proto_init() {
 			}
 		}
 		file_checkout_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListCartResponse_CartItemResponse); i {
+			switch v := v.(*ListCartResponse_CartItem); i {
 			case 0:
 				return &v.state
 			case 1:

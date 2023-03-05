@@ -1,7 +1,8 @@
-package service
+package checkout
 
 import (
 	"context"
+
 	"route256/checkout/internal/convert"
 	desc "route256/checkout/pkg/checkout"
 )

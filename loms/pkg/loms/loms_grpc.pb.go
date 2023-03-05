@@ -20,7 +20,7 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// LomsClient is the client API for Loms service.
+// LomsClient is the client API for Loms checkout.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LomsClient interface {
@@ -84,7 +84,7 @@ func (c *lomsClient) Stock(ctx context.Context, in *StocksRequest, opts ...grpc.
 	return out, nil
 }
 
-// LomsServer is the server API for Loms service.
+// LomsServer is the server API for Loms checkout.
 // All implementations must embed UnimplementedLomsServer
 // for forward compatibility
 type LomsServer interface {
@@ -117,7 +117,7 @@ func (UnimplementedLomsServer) Stock(context.Context, *StocksRequest) (*StocksRe
 }
 func (UnimplementedLomsServer) mustEmbedUnimplementedLomsServer() {}
 
-// UnsafeLomsServer may be embedded to opt out of forward compatibility for this service.
+// UnsafeLomsServer may be embedded to opt out of forward compatibility for this checkout.
 // Use of this interface is not recommended, as added methods to LomsServer will
 // result in compilation errors.
 type UnsafeLomsServer interface {
@@ -218,7 +218,7 @@ func _Loms_Stock_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-// Loms_ServiceDesc is the grpc.ServiceDesc for Loms service.
+// Loms_ServiceDesc is the grpc.ServiceDesc for Loms checkout.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Loms_ServiceDesc = grpc.ServiceDesc{
