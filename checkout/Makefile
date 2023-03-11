@@ -73,3 +73,6 @@ generate:
 	--go_out=pkg/product-service --go_opt=paths=source_relative \
 	--go-grpc_out=pkg/product-service --go-grpc_opt=paths=source_relative \
 	vendor-proto/product-service/product-service.proto
+
+migrate:
+	source .env && cd migrations && ./migrate.sh

@@ -1,4 +1,5 @@
 token: "secret"
+dsn: "host=localhost port=5433 user=checkout password=password dbname=checkout-db sslmode=disable"
 services:
   checkout: ":8081"
   loms: "loms:8082"

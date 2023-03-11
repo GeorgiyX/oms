@@ -1,4 +1,4 @@
-package usecase
+package checkout
 
 import (
 	"context"
@@ -20,8 +20,17 @@ func (u *useCase) AddToCart(ctx context.Context, user int64, sku uint32, count u
 	for _, stock := range stocks {
 		counter -= int64(stock.Count)
 		if counter <= 0 {
-			return nil
+			break
 		}
+	}
+
+	if counter > 0 {
+		return ErrInsufficientStocks
+	}
+
+	err = u.repo.Add(ctx, user, sku, count)
+	if err != nil {
+		return errors.Wrap(err, "add sku")
 	}
 
 	return ErrInsufficientStocks

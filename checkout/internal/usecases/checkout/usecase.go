@@ -1,10 +1,11 @@
-package usecase
+package checkout
 
 import (
 	"context"
 	"route256/checkout/internal/clients/loms"
 	productService "route256/checkout/internal/clients/product_service"
 	"route256/checkout/internal/model"
+	"route256/checkout/internal/repositories/cart"
 )
 
 var _ UseCase = (*useCase)(nil)
@@ -19,16 +20,19 @@ type UseCase interface {
 type useCase struct {
 	stocksChecker   loms.StocksChecker
 	productResolver productService.SkuResolver
+	repo            cart.Repository
 }
 
 type Config struct {
 	loms.StocksChecker
 	productService.SkuResolver
+	cart.Repository
 }
 
 func New(config Config) *useCase {
 	return &useCase{
 		stocksChecker:   config.StocksChecker,
 		productResolver: config.SkuResolver,
+		repo:            config.Repository,
 	}
 }

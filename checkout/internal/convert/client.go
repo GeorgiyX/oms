@@ -40,3 +40,14 @@ func ToCreateOrderRequest(user int64, items []model.CreateOrderItem) *descLoms.C
 
 	return out
 }
+
+func ToCreateOrderItems(in []model.CartItemDB) []model.CreateOrderItem {
+	out := make([]model.CreateOrderItem, 0, len(in))
+	for _, item := range in {
+		out = append(out, model.CreateOrderItem{
+			SKU:   item.Sku,
+			Count: item.Count,
+		})
+	}
+	return out
+}

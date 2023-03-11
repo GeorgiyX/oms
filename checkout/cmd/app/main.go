@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -12,7 +14,8 @@ import (
 	"route256/checkout/internal/clients/loms"
 	productService "route256/checkout/internal/clients/product_service"
 	"route256/checkout/internal/config"
-	"route256/checkout/internal/usecase"
+	"route256/checkout/internal/repositories/cart"
+	checkout2 "route256/checkout/internal/usecases/checkout"
 	desc "route256/checkout/pkg/checkout"
 	descProductService "route256/checkout/pkg/product-service"
 	"route256/libs/middleware"
@@ -21,6 +24,18 @@ import (
 
 func main() {
 	config.Init()
+
+	ctx := context.Background()
+	pool, err := pgxpool.Connect(ctx, config.Instance.DSN)
+	if err != nil {
+		log.Fatalf("failed to connect to DB: %v", err)
+	}
+	defer pool.Close()
+
+	err = pool.Ping(ctx)
+	if err != nil {
+		log.Fatalf("unsuccess db ping: %v", err)
+	}
 
 	opts := grpc.WithTransportCredentials(insecure.NewCredentials())
 
@@ -38,11 +53,12 @@ func main() {
 	defer connLoms.Close()
 	productServiceClient := descProductService.NewProductServiceClient(connProduct)
 
-	useCaseConfig := usecase.Config{
+	useCaseConfig := checkout2.Config{
 		StocksChecker: loms.New(lomsClient),
 		SkuResolver:   productService.New(productServiceClient),
+		Repository:    cart.New(pool),
 	}
-	useCaseInstance := usecase.New(useCaseConfig)
+	useCaseInstance := checkout2.New(useCaseConfig)
 	serviceInstance := checkout.New(useCaseInstance)
 
 	s := grpc.NewServer(

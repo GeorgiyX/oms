@@ -7,6 +7,7 @@ import (
 
 type Config struct {
 	Token    string `yaml:"token"`
+	DSN      string `yaml:"dsn"`
 	Services struct {
 		Checkout       string `yaml:"checkout"`
 		Loms           string `yaml:"loms"`
