@@ -8,15 +8,16 @@ services:
     volumes:
       - ./checkout:/checkout # for config read
   postgres-checkout:
-    image: postgres:14.4
+    image: postgres:15
+    command: -p 5433
     environment:
       POSTGRES_USER: checkout
       POSTGRES_PASSWORD: password
       POSTGRES_DB: checkout-db
     volumes:
-      - ./db_data/checkout:/var/lib/postgresql/data
+      - db-data-checkout:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - 5433:5433
   loms:
     image: loms
     build: ./loms/
@@ -25,17 +26,21 @@ services:
     volumes:
       - ./loms:/loms  # for config read
   postgres-loms:
-    image: postgres:14.4
+    image: postgres:15
+    command: -p 5434
     environment:
       POSTGRES_USER: loms
       POSTGRES_PASSWORD: password
       POSTGRES_DB: loms-db
     volumes:
-      - ./db_data/loms:/var/lib/postgresql/data
+      - db-data-loms:/var/lib/postgresql/data
     ports:
-      - 5433:5433
+      - 5434:5434
   # notification:
   #   image: notification
   #   build: ./notification
   #   ports:
   #     - "8082:8082"
+volumes:
+  db-data-checkout:
+  db-data-loms:

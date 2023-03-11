@@ -2,5 +2,4 @@
 .DS_Store
 config.yaml
 vendor-proto/
-db_data/
 generate/
