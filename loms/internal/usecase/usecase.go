@@ -2,7 +2,10 @@ package usecase
 
 import (
 	"context"
+
 	"route256/loms/internal/model"
+	"route256/loms/internal/repositories/order"
+	"route256/loms/internal/repositories/warehouse"
 )
 
 var _ UseCase = (*useCase)(nil)
@@ -16,8 +19,18 @@ type UseCase interface {
 }
 
 type useCase struct {
+	warehouseRepo warehouse.Repository
+	orderRepo     order.Repository
 }
 
-func New() *useCase {
-	return &useCase{}
+type Config struct {
+	WarehouseRepository warehouse.Repository
+	OrderRepository     order.Repository
+}
+
+func New(config Config) *useCase {
+	return &useCase{
+		warehouseRepo: config.WarehouseRepository,
+		orderRepo:     config.OrderRepository,
+	}
 }
