@@ -7,6 +7,16 @@ services:
       - "8081:8081"
     volumes:
       - ./checkout:/checkout # for config read
+  postgres-checkout:
+    image: postgres:14.4
+    environment:
+      POSTGRES_USER: checkout
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: checkout-db
+    volumes:
+      - ./db_data/checkout:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
   loms:
     image: loms
     build: ./loms/
@@ -14,6 +24,16 @@ services:
       - "8082:8082"
     volumes:
       - ./loms:/loms  # for config read
+  postgres-loms:
+    image: postgres:14.4
+    environment:
+      POSTGRES_USER: loms
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: loms-db
+    volumes:
+      - ./db_data/loms:/var/lib/postgresql/data
+    ports:
+      - 5433:5433
   # notification:
   #   image: notification
   #   build: ./notification

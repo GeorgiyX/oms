@@ -1,4 +1,6 @@
-.idea
+.idea/
 .DS_Store
 config.yaml
-vendor-proto
+vendor-proto/
+db_data/
+generate/
