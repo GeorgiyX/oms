@@ -33,5 +33,5 @@ func (u *useCase) AddToCart(ctx context.Context, user int64, sku uint32, count u
 		return errors.Wrap(err, "add sku")
 	}
 
-	return ErrInsufficientStocks
+	return nil
 }
