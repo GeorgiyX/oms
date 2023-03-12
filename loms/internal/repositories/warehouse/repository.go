@@ -2,7 +2,6 @@ package warehouse
 
 import (
 	"context"
-
 	"route256/libs/db"
 	"route256/loms/internal/model"
 )

@@ -1,11 +1,11 @@
-package usecase
+package loms
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
 	"route256/loms/internal/convert"
 	"route256/loms/internal/model"
+
+	"github.com/pkg/errors"
 )
 
 func (u *useCase) Stock(ctx context.Context, sku uint32) ([]model.StocksItemInfo, error) {

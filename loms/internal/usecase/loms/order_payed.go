@@ -1,10 +1,10 @@
-package usecase
+package loms
 
 import (
 	"context"
+	"route256/loms/internal/model"
 
 	"github.com/pkg/errors"
-	"route256/loms/internal/model"
 )
 
 func (u *useCase) OrderPayed(ctx context.Context, orderID int64) error {

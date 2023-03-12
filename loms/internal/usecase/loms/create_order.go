@@ -1,13 +1,13 @@
-package usecase
+package loms
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
-	"google.golang.org/appengine/log"
 	"route256/libs/db"
 	"route256/loms/internal/convert"
 	"route256/loms/internal/model"
+
+	"github.com/pkg/errors"
+	"google.golang.org/appengine/log"
 )
 
 var (

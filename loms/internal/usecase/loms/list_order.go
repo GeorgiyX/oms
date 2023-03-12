@@ -1,11 +1,11 @@
-package usecase
+package loms
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
 	"route256/loms/internal/convert"
 	"route256/loms/internal/model"
+
+	"github.com/pkg/errors"
 )
 
 func (u *useCase) ListOrder(ctx context.Context, orderID int64) (model.Order, error) {

@@ -2,9 +2,9 @@ package checkout
 
 import (
 	"context"
+	"route256/checkout/internal/convert"
 
 	"github.com/pkg/errors"
-	"route256/checkout/internal/convert"
 )
 
 func (u *useCase) Purchase(ctx context.Context, user int64) (int64, error) {

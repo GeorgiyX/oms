@@ -1,11 +1,11 @@
-package usecase
+package loms
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
 	"route256/libs/db"
 	"route256/loms/internal/model"
+
+	"github.com/pkg/errors"
 )
 
 func (u *useCase) CancelOrder(ctx context.Context, orderID int64) error {

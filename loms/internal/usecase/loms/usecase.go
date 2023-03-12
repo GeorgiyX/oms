@@ -1,9 +1,8 @@
-package usecase
+package loms
 
 import (
 	"context"
 	"route256/libs/db"
-
 	"route256/loms/internal/model"
 	"route256/loms/internal/repositories/order"
 	"route256/loms/internal/repositories/warehouse"

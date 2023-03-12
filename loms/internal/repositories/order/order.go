@@ -2,9 +2,9 @@ package order
 
 import (
 	"context"
+	"route256/loms/internal/model"
 
 	"github.com/pkg/errors"
-	"route256/loms/internal/model"
 )
 
 func (r *repository) CreateOrder(ctx context.Context, user int64) (int64, error) {

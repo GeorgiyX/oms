@@ -2,9 +2,9 @@ package warehouse
 
 import (
 	"context"
+	"route256/loms/internal/model"
 
 	"github.com/pkg/errors"
-	"route256/loms/internal/model"
 )
 
 func (r *repository) SkuStock(ctx context.Context, sku uint32) ([]model.Warehouse, error) {

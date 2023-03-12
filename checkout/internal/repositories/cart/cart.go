@@ -2,9 +2,9 @@ package cart
 
 import (
 	"context"
+	"route256/checkout/internal/model"
 
 	"github.com/pkg/errors"
-	"route256/checkout/internal/model"
 )
 
 func (r *repository) Add(ctx context.Context, user int64, sku uint32, count uint32) error {

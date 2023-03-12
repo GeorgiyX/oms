@@ -4,19 +4,19 @@ import (
 	"context"
 	"log"
 	"net"
-
-	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/jackc/pgx/v4/pgxpool"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"route256/libs/db"
 	"route256/libs/middleware"
 	"route256/loms/internal/app/loms"
 	"route256/loms/internal/config"
 	"route256/loms/internal/repositories/order"
 	"route256/loms/internal/repositories/warehouse"
-	"route256/loms/internal/usecase"
+	loms2 "route256/loms/internal/usecase/loms"
 	desc "route256/loms/pkg/loms"
+
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/jackc/pgx/v4/pgxpool"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -36,8 +36,8 @@ func main() {
 
 	txDB := db.NewPgxPoolDB(pool)
 
-	useCaseInstance := usecase.New(
-		usecase.Config{
+	useCaseInstance := loms2.New(
+		loms2.Config{
 			WarehouseRepository: warehouse.New(txDB),
 			OrderRepository:     order.New(txDB),
 			TxDB:                txDB,

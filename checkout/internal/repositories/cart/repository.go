@@ -2,9 +2,8 @@ package cart
 
 import (
 	"context"
-	"route256/libs/db"
-
 	"route256/checkout/internal/model"
+	"route256/libs/db"
 )
 
 var _ Repository = (*repository)(nil)
