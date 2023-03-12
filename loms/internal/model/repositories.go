@@ -20,3 +20,10 @@ type Warehouse struct {
 	Sku              uint32 `db:"sku"`
 	AvailableToOrder uint32 `db:"available_to_order"`
 }
+
+type Reserve struct {
+	Sku         uint32 `db:"sku"`
+	WarehouseID int64  `db:"warehouse_id"`
+	Count       uint32 `db:"count"`
+	OrderInfoID int64  `db:"fk_order_info_id"`
+}

@@ -5,6 +5,8 @@ CREATE TABLE warehouse(
                           warehouse_id BIGINT NOT NULL,
                           sku INT NOT NULL ,
                           available_to_order INT NOT NULL DEFAULT 0
+                              CONSTRAINT not_negative_sku_count_check
+                              CHECK (available_to_order >= 0)
 );
 
 CREATE UNIQUE INDEX warehouse_uniq_idx ON warehouse (warehouse_id, sku);
@@ -62,6 +64,16 @@ CREATE TABLE order_item (
 
 CREATE UNIQUE INDEX order_item_uniq_idx ON order_item(sku, fk_order_info_id);
 
+CREATE TABLE reserve (
+                         sku INT NOT NULL,
+                         warehouse_id BIGINT NOT NULL,
+                         count INT NOT NULL DEFAULT 0,
+                         fk_order_info_id BIGINT NOT NULL REFERENCES order_info
+
+);
+
+CREATE UNIQUE INDEX reserve_uniq_idx ON reserve(sku, warehouse_id, fk_order_info_id);
+
 -- +goose StatementEnd
 
 -- +goose Down
@@ -79,5 +91,8 @@ DROP TABLE order_info;
 
 DROP INDEX order_item_uniq_idx;
 DROP TABLE order_item;
+
+DROP INDEX reserve_uniq_idx;
+DROP TABLE reserve;
 
 -- +goose StatementEnd
