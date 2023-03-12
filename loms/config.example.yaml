@@ -1,2 +1,3 @@
+dsn: "host=localhost port=5434 user=loms password=password dbname=loms-db sslmode=disable"
 services:
   loms: ":8082"

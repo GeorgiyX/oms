@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"route256/libs/db"
 
 	"route256/loms/internal/model"
 	"route256/loms/internal/repositories/order"
@@ -21,16 +22,19 @@ type UseCase interface {
 type useCase struct {
 	warehouseRepo warehouse.Repository
 	orderRepo     order.Repository
+	db            db.TxDB
 }
 
 type Config struct {
 	WarehouseRepository warehouse.Repository
 	OrderRepository     order.Repository
+	TxDB                db.TxDB
 }
 
 func New(config Config) *useCase {
 	return &useCase{
 		warehouseRepo: config.WarehouseRepository,
 		orderRepo:     config.OrderRepository,
+		db:            config.TxDB,
 	}
 }

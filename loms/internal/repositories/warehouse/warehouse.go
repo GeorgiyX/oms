@@ -3,7 +3,6 @@ package warehouse
 import (
 	"context"
 
-	"github.com/georgysavva/scany/pgxscan"
 	"github.com/pkg/errors"
 	"route256/loms/internal/model"
 )
@@ -12,7 +11,7 @@ func (r *repository) SkuStock(ctx context.Context, sku uint32) ([]model.Warehous
 	const query = `SELECT warehouse_id, sku, available_to_order FROM warehouse WHERE sku = $1;`
 
 	var items []model.Warehouse
-	err := pgxscan.Select(ctx, r.db, &items, query, sku)
+	err := r.db.Select(ctx, &items, query, sku)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot fetch sku stock")
 	}
@@ -24,7 +23,7 @@ func (r *repository) IsEnough(ctx context.Context, sku uint32, count uint32) (bo
 	const query = `SELECT sum(available_to_order) >= $2 FROM warehouse WHERE sku = $1;`
 
 	var isEnough bool
-	err := pgxscan.Get(ctx, r.db, &isEnough, query, sku, count)
+	err := r.db.Get(ctx, &isEnough, query, sku, count)
 	if err != nil {
 		return false, errors.Wrap(err, "check is enough")
 	}
@@ -52,7 +51,7 @@ func (r *repository) ReserveNext(ctx context.Context, sku uint32, count uint32, 
 	RETURNING remain;`
 
 	var remain uint32
-	err := pgxscan.Get(ctx, r.db, &remain, query, sku, count)
+	err := r.db.Get(ctx, &remain, query, sku, count)
 	if err != nil {
 		return 0, errors.Wrap(err, "cannot reserve sku")
 	}

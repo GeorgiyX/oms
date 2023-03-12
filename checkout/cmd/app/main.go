@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"route256/libs/db"
 
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -37,6 +38,8 @@ func main() {
 		log.Fatalf("unsuccess db ping: %v", err)
 	}
 
+	txDB := db.NewPgxPoolDB(pool)
+
 	opts := grpc.WithTransportCredentials(insecure.NewCredentials())
 
 	connLoms, err := grpc.Dial(config.Instance.Services.Loms, opts)
@@ -56,7 +59,7 @@ func main() {
 	useCaseConfig := checkout2.Config{
 		StocksChecker: loms.New(lomsClient),
 		SkuResolver:   productService.New(productServiceClient),
-		Repository:    cart.New(pool),
+		Repository:    cart.New(txDB),
 	}
 	useCaseInstance := checkout2.New(useCaseConfig)
 	serviceInstance := checkout.New(useCaseInstance)

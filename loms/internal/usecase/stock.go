@@ -2,22 +2,17 @@ package usecase
 
 import (
 	"context"
+
+	"github.com/pkg/errors"
+	"route256/loms/internal/convert"
 	"route256/loms/internal/model"
-
-	"github.com/brianvoe/gofakeit/v6"
-)
-
-const (
-	warehousesCount = 3
 )
 
 func (u *useCase) Stock(ctx context.Context, sku uint32) ([]model.StocksItemInfo, error) {
-	items := make([]model.StocksItemInfo, 0, warehousesCount)
-	for i := 0; i < warehousesCount; i++ {
-		items = append(items, model.StocksItemInfo{
-			WarehouseID: gofakeit.Int64(),
-			Count:       gofakeit.Uint64(),
-		})
+	stocks, err := u.warehouseRepo.SkuStock(ctx, sku)
+	if err != nil {
+		return nil, errors.Wrap(err, "sku stock")
 	}
-	return items, nil
+
+	return convert.ToStocksItemInfo(stocks), nil
 }

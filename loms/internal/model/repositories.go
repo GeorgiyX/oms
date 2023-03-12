@@ -18,7 +18,7 @@ type OrderItemDB struct {
 type Warehouse struct {
 	WarehouseID      int64  `db:"warehouse_id"`
 	Sku              uint32 `db:"sku"`
-	AvailableToOrder uint32 `db:"available_to_order"`
+	AvailableToOrder uint64 `db:"available_to_order"`
 }
 
 type Reserve struct {

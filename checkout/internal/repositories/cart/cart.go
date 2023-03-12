@@ -3,7 +3,6 @@ package cart
 import (
 	"context"
 
-	"github.com/georgysavva/scany/pgxscan"
 	"github.com/pkg/errors"
 	"route256/checkout/internal/model"
 )
@@ -37,7 +36,7 @@ func (r *repository) List(ctx context.Context, user int64) ([]model.CartItemDB, 
 	const query = `SELECT user_id, sku, count FROM cart WHERE user_id = $1;`
 
 	var items []model.CartItemDB
-	err := pgxscan.Select(ctx, r.db, &items, query, user)
+	err := r.db.Select(ctx, &items, query, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot fetch user cart items")
 	}

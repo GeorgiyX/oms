@@ -6,6 +6,7 @@ import (
 )
 
 type Config struct {
+	DSN      string `yaml:"dsn"`
 	Services struct {
 		Loms string `yaml:"loms"`
 	} `yaml:"services"`

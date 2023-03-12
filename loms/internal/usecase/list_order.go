@@ -2,26 +2,22 @@ package usecase
 
 import (
 	"context"
-	"route256/loms/internal/model"
 
-	"github.com/brianvoe/gofakeit/v6"
+	"github.com/pkg/errors"
+	"route256/loms/internal/convert"
+	"route256/loms/internal/model"
 )
 
-const ordersSize = 5
-
 func (u *useCase) ListOrder(ctx context.Context, orderID int64) (model.Order, error) {
-	order := model.Order{
-		Status:  model.New,
-		User:    gofakeit.Int64(),
-		Items:   nil,
-		OrderID: gofakeit.Int64(),
+	order, err := u.orderRepo.GetOrderInfo(ctx, orderID)
+	if err != nil {
+		return model.Order{}, errors.Wrap(err, "get order info")
 	}
-	order.Items = make([]model.OrderItem, 0, ordersSize)
-	for i := 0; i < warehousesCount; i++ {
-		order.Items = append(order.Items, model.OrderItem{
-			SKU:   gofakeit.Uint32(),
-			Count: gofakeit.Uint32(),
-		})
+
+	orderItems, err := u.orderRepo.GetOrderItems(ctx, orderID)
+	if err != nil {
+		return model.Order{}, errors.Wrap(err, "get order items")
 	}
-	return order, nil
+
+	return convert.ToOrder(order, orderItems), nil
 }

@@ -3,7 +3,7 @@ package order
 import (
 	"context"
 
-	"github.com/jackc/pgx/v4/pgxpool"
+	"route256/libs/db"
 	"route256/loms/internal/model"
 )
 
@@ -18,10 +18,10 @@ type Repository interface {
 }
 
 type repository struct {
-	db *pgxpool.Pool
+	db db.TxDB
 }
 
-func New(db *pgxpool.Pool) *repository {
+func New(db db.TxDB) *repository {
 	return &repository{
 		db: db,
 	}

@@ -3,7 +3,6 @@ package order
 import (
 	"context"
 
-	"github.com/georgysavva/scany/pgxscan"
 	"github.com/pkg/errors"
 	"route256/loms/internal/model"
 )
@@ -12,7 +11,7 @@ func (r *repository) CreateOrder(ctx context.Context, user int64) (int64, error)
 	const query = `INSERT INTO order_info(user_id, status) VALUES ($1, status_new()) RETURNING id;`
 
 	var id int64
-	err := pgxscan.Get(ctx, r.db, &id, query, user)
+	err := r.db.Get(ctx, &id, query, user)
 	if err != nil {
 		return 0, errors.Wrap(err, "cannot create order info")
 	}
@@ -58,7 +57,7 @@ func (r *repository) GetOrderInfo(ctx context.Context, order int64) (model.Order
 	const query = `SELECT id, user_id, created_at, status FROM order_info WHERE id = $1;`
 
 	var info model.OrderInfo
-	err := pgxscan.Get(ctx, r.db, &info, query, order)
+	err := r.db.Get(ctx, &info, query, order)
 	if err != nil {
 		return model.OrderInfo{}, errors.Wrap(err, "cannot fetch order info")
 	}
@@ -70,7 +69,7 @@ func (r *repository) GetOrderItems(ctx context.Context, order int64) ([]model.Or
 	const query = `SELECT sku, fk_order_info_id, count FROM order_item WHERE fk_order_info_id = $1;`
 
 	var items []model.OrderItemDB
-	err := pgxscan.Select(ctx, r.db, &items, query, order)
+	err := r.db.Select(ctx, &items, query, order)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot fetch order items")
 	}
