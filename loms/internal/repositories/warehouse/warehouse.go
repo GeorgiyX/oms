@@ -48,10 +48,10 @@ func (r *repository) ReserveNext(ctx context.Context, sku uint32, count uint32, 
         RETURNING td.sku, td.warehouse_id, td.remain, td.reserved)
 	INSERT INTO reserve(sku, warehouse_id, count, fk_order_info_id)
 		   SELECT sku, warehouse_id, reserved, $3 FROM to_reserve
-	RETURNING remain;`
+	RETURNING (SELECT remain FROM to_reserve);`
 
 	var remain uint32
-	err := r.db.Get(ctx, &remain, query, sku, count)
+	err := r.db.Get(ctx, &remain, query, sku, count, order)
 	if err != nil {
 		return 0, errors.Wrap(err, "cannot reserve sku")
 	}

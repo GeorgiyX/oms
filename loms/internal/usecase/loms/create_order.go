@@ -2,12 +2,12 @@ package loms
 
 import (
 	"context"
+	"fmt"
 	"route256/libs/db"
 	"route256/loms/internal/convert"
 	"route256/loms/internal/model"
 
 	"github.com/pkg/errors"
-	"google.golang.org/appengine/log"
 )
 
 var (
@@ -42,7 +42,7 @@ func (u *useCase) CreateOrder(ctx context.Context, user int64, items []model.Ord
 			}
 
 			if err != nil {
-				log.Warningf(ctxTx, "can't reserve sku: %v", err)
+				fmt.Printf("can't reserve sku: %v", err)
 				break
 			}
 		}

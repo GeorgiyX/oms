@@ -68,6 +68,7 @@ func (p *pgxPoolDB) Exec(ctx context.Context, query string, args ...interface{})
 	if err != nil {
 		return nil, err
 	}
+	rows.Close()
 	return rows.CommandTag(), nil
 }
 
