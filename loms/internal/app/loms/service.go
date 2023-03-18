@@ -1,16 +1,16 @@
 package loms
 
 import (
-	"route256/loms/internal/usecase"
+	"route256/loms/internal/usecase/loms"
 	desc "route256/loms/pkg/loms"
 )
 
 type Service struct {
 	desc.UnimplementedLomsServer
-	useCase usecase.UseCase
+	useCase loms.UseCase
 }
 
-func New(businessLogic usecase.UseCase) *Service {
+func New(businessLogic loms.UseCase) *Service {
 	return &Service{
 		useCase: businessLogic,
 	}

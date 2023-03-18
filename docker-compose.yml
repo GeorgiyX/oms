@@ -7,6 +7,44 @@ services:
       - "8081:8081"
     volumes:
       - ./checkout:/checkout # for config read
+    networks:
+      - net
+    depends_on:
+      - pgbouncer-checkout
+  postgres-checkout:
+    image: postgres:15
+    command: -p 5433
+    environment:
+      POSTGRES_USER: checkout
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: checkout-db
+    volumes:
+      - db-data-checkout:/var/lib/postgresql/data
+    ports:
+      - 5433:5433
+    networks:
+      - net
+  pgbouncer-checkout:
+    image: bitnami/pgbouncer
+    environment:
+      POSTGRESQL_USERNAME: checkout
+      POSTGRESQL_PASSWORD: password
+      POSTGRESQL_HOST: postgres-checkout
+      POSTGRESQL_DATABASE: checkout-db
+      POSTGRESQL_PORT: 5433
+      PGBOUNCER_SET_DATABASE_USER: yes
+      PGBOUNCER_SET_DATABASE_PASSWORD: yes
+      PGBOUNCER_DATABASE: checkout-db
+      PGBOUNCER_POOL_MODE: session
+      PGBOUNCER_AUTH_USER: checkout
+      PGBOUNCER_PORT: 6433
+      PGBOUNCER_BIND_ADDRESS: pgbouncer-checkout
+    ports:
+      - 6433:6433
+    depends_on:
+      - postgres-checkout
+    networks:
+      - net
   loms:
     image: loms
     build: ./loms/
@@ -14,8 +52,53 @@ services:
       - "8082:8082"
     volumes:
       - ./loms:/loms  # for config read
+    networks:
+      - net
+    depends_on:
+      - pgbouncer-loms
+  postgres-loms:
+    image: postgres:15
+    command: -p 5434
+    environment:
+      POSTGRES_USER: loms
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: loms-db
+    volumes:
+      - db-data-loms:/var/lib/postgresql/data
+    ports:
+      - 5434:5434
+    networks:
+      - net
+  pgbouncer-loms:
+    image: bitnami/pgbouncer
+    environment:
+      POSTGRESQL_USERNAME: loms
+      POSTGRESQL_PASSWORD: password
+      POSTGRESQL_HOST: postgres-loms
+      POSTGRESQL_DATABASE: loms-db
+      POSTGRESQL_PORT: 5434
+      PGBOUNCER_SET_DATABASE_USER: yes
+      PGBOUNCER_SET_DATABASE_PASSWORD: yes
+      PGBOUNCER_DATABASE: loms-db
+      PGBOUNCER_POOL_MODE: session
+      PGBOUNCER_AUTH_USER: loms
+      PGBOUNCER_PORT: 6434
+      PGBOUNCER_BIND_ADDRESS: pgbouncer-loms
+    ports:
+      - 6434:6434
+    depends_on:
+      - postgres-loms
+    networks:
+      - net
   # notification:
   #   image: notification
   #   build: ./notification
   #   ports:
   #     - "8082:8082"
+volumes:
+  db-data-checkout:
+  db-data-loms:
+
+networks:
+  net:
+    driver: bridge

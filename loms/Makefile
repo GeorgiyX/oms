@@ -68,3 +68,6 @@ generate:
 	--go_out=pkg/loms --go_opt=paths=source_relative \
 	--go-grpc_out=pkg/loms --go-grpc_opt=paths=source_relative \
 	api/loms/loms.proto
+
+migrate:
+	source .env && cd migrations && ./migrate.sh

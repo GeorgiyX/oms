@@ -2,9 +2,9 @@ package loms
 
 import (
 	"context"
+	desc "route256/loms/pkg/loms"
 
 	"google.golang.org/protobuf/types/known/emptypb"
-	desc "route256/loms/pkg/loms"
 )
 
 func (h *Service) CancelOrder(ctx context.Context, req *desc.CancelOrderRequest) (*emptypb.Empty, error) {

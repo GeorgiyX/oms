@@ -1,15 +1,20 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
+	"route256/libs/db"
 	"route256/libs/middleware"
 	"route256/loms/internal/app/loms"
 	"route256/loms/internal/config"
-	"route256/loms/internal/usecase"
+	"route256/loms/internal/repositories/order"
+	"route256/loms/internal/repositories/warehouse"
+	loms2 "route256/loms/internal/usecase/loms"
 	desc "route256/loms/pkg/loms"
 
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -17,7 +22,27 @@ import (
 func main() {
 	config.Init()
 
-	useCaseInstance := usecase.New()
+	ctx := context.Background()
+	pool, err := pgxpool.Connect(ctx, config.Instance.DSN)
+	if err != nil {
+		log.Fatalf("failed to connect to DB: %v", err)
+	}
+	defer pool.Close()
+
+	err = pool.Ping(ctx)
+	if err != nil {
+		log.Fatalf("unsuccess db ping: %v", err)
+	}
+
+	txDB := db.NewPgxPoolDB(pool)
+
+	useCaseInstance := loms2.New(
+		loms2.Config{
+			WarehouseRepository: warehouse.New(txDB),
+			OrderRepository:     order.New(txDB),
+			TxDB:                txDB,
+		},
+	)
 	serviceInstance := loms.New(useCaseInstance)
 
 	s := grpc.NewServer(
