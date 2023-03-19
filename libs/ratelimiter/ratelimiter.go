@@ -11,10 +11,10 @@ var (
 	ErrWillExceedDeadLine = errors.New("ratelimiter: wait with this ctx would exceed context deadline")
 )
 
-// Config represent requests (aka token) per interval (aka buket length)
+// Config represent Requests (aka token) per Interval (aka buket length)
 type Config struct {
-	interval time.Duration // buket length
-	requests uint64        // tokens in bucket
+	Interval time.Duration // buket length
+	Requests uint64        // tokens in bucket
 }
 
 type ratelimiter struct {
@@ -27,12 +27,17 @@ type ratelimiter struct {
 func New(config Config) *ratelimiter {
 	return &ratelimiter{
 		Mutex:  sync.Mutex{},
-		end:    time.Now().Add(config.interval),
+		end:    time.Now().Add(config.Interval),
 		tokens: 0,
 		config: config,
 	}
 }
 
+// Wait is completed no more often than "Requests" once in the "Interval".
+// The algorithm splits the timeline into buckets with a duration of "Interval"
+// on which Wait method can terminate no more than "Requests" times.
+// The algorithm selects nearest bucket on and waits until the moment of occurrence
+// of the bucket. If the context deadline comes earlier, an error is returned.
 func (r *ratelimiter) Wait(ctx context.Context) error {
 	r.Lock()
 	now := time.Now()
@@ -62,14 +67,14 @@ func (r *ratelimiter) updateBucket(now time.Time) {
 		return
 	}
 
-	r.tokens = r.config.requests
+	r.tokens = r.config.Requests
 
 	if r.end.After(now) {
-		r.end = r.end.Add(r.config.interval) // reserve next bucket
+		r.end = r.end.Add(r.config.Interval) // reserve next bucket
 		return
 	}
 
-	r.end = now.Add(r.config.interval) // bucket start right now
+	r.end = now.Add(r.config.Interval) // bucket start right now
 }
 
 func (r *ratelimiter) isAfterDeadline(ctx context.Context, moment time.Time) bool {
@@ -81,7 +86,7 @@ func (r *ratelimiter) isAfterDeadline(ctx context.Context, moment time.Time) boo
 }
 
 func (r *ratelimiter) bucketStartTime() time.Time {
-	return r.end.Add(-1 * r.config.interval)
+	return r.end.Add(-1 * r.config.Interval)
 }
 
 func (r *ratelimiter) takeToken() {

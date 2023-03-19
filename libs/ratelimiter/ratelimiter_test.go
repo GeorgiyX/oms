@@ -10,8 +10,8 @@ import (
 func TestRateLimiter(t *testing.T) {
 	t.Run("should block if limit", func(t *testing.T) {
 		rl := New(Config{
-			interval: time.Second,
-			requests: 2,
+			Interval: time.Second,
+			Requests: 2,
 		})
 
 		start := time.Now()
@@ -25,8 +25,8 @@ func TestRateLimiter(t *testing.T) {
 
 	t.Run("should return error if deadline happen before wait time end", func(t *testing.T) {
 		rl := New(Config{
-			interval: time.Second * 3,
-			requests: 1,
+			Interval: time.Second * 3,
+			Requests: 1,
 		})
 
 		ctx := context.Background()

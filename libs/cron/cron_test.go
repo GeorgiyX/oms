@@ -13,18 +13,18 @@ import (
 
 func newTaskDesc(flag *atomic.Bool, err error, errCB ErrCallBack) TaskDescriptor {
 	return TaskDescriptor{
-		period: time.Second,
-		task: func(ctx context.Context) error {
+		Period: time.Second,
+		Task: func(ctx context.Context) error {
 			flag.Store(true)
 			return err
 		},
-		errCB:       errCB,
-		retryPolicy: ImmediatelyAfterError,
+		ErrCB:       errCB,
+		RetryPolicy: ImmediatelyAfterError,
 	}
 }
 
 func TestCron(t *testing.T) {
-	t.Run("should periodically run task", func(t *testing.T) {
+	t.Run("should periodically run Task", func(t *testing.T) {
 		c := New()
 		firstCallFlag := &atomic.Bool{}
 		secondCallFlag := &atomic.Bool{}
@@ -35,7 +35,7 @@ func TestCron(t *testing.T) {
 		require.True(t, secondCallFlag.Load())
 	})
 
-	t.Run("should periodically run task and report about err", func(t *testing.T) {
+	t.Run("should periodically run Task and report about err", func(t *testing.T) {
 		c := New()
 		firstCallFlag := &atomic.Bool{}
 		secondCallFlag := &atomic.Bool{}

@@ -2,11 +2,11 @@ package checkout
 
 import (
 	"context"
-	"route256/checkout/internal/model"
-	"route256/libs/workerpool"
 	"sync"
 
 	"github.com/pkg/errors"
+	"route256/checkout/internal/model"
+	"route256/libs/workerpool"
 )
 
 const maxWorkers = 5
@@ -40,7 +40,12 @@ func (u *useCase) ListCart(ctx context.Context, user int64) (model.Cart, error) 
 			cart.TotalPrice += product.Price * item.Count
 			return nil
 		})
-
 	}
+
+	err = pool.Stop()
+	if err != nil {
+		return model.Cart{}, err
+	}
+
 	return cart, nil
 }

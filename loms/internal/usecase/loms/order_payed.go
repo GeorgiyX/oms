@@ -8,7 +8,7 @@ import (
 )
 
 func (u *useCase) OrderPayed(ctx context.Context, orderID int64) error {
-	err := u.orderRepo.SetOrderStatus(ctx, orderID, model.Payed)
+	err := u.orderRepo.SetOrderStatuses(ctx, []int64{orderID}, model.Payed)
 	if err != nil {
 		return errors.Wrap(err, "set order status")
 	}

@@ -25,10 +25,10 @@ type Cron interface {
 }
 
 type TaskDescriptor struct {
-	period      time.Duration
-	task        Task
-	errCB       ErrCallBack
-	retryPolicy RetryPolicy
+	Period      time.Duration
+	Task        Task
+	ErrCB       ErrCallBack
+	RetryPolicy RetryPolicy
 }
 
 type cron struct {
@@ -49,14 +49,14 @@ func (c *cron) Add(descriptor TaskDescriptor) {
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
-		after := time.After(descriptor.period)
+		after := time.After(descriptor.Period)
 		for {
 			var err error
 			select {
 			case <-after:
-				err = descriptor.task(context.Background())
+				err = descriptor.Task(context.Background())
 				if err != nil {
-					descriptor.errCB(err)
+					descriptor.ErrCB(err)
 				}
 			}
 
@@ -68,7 +68,7 @@ func (c *cron) Add(descriptor TaskDescriptor) {
 				after = afterErr(descriptor)
 				continue
 			}
-			after = time.After(descriptor.period)
+			after = time.After(descriptor.Period)
 		}
 	}()
 }
@@ -79,12 +79,12 @@ func (c *cron) Stop() {
 }
 
 func afterErr(descriptor TaskDescriptor) <-chan time.Time {
-	switch descriptor.retryPolicy {
+	switch descriptor.RetryPolicy {
 	case ImmediatelyAfterError:
 		return time.After(time.Millisecond * 100)
 	case ByScheduleAfterError:
-		return time.After(descriptor.period)
+		return time.After(descriptor.Period)
 	default:
-		return time.After(descriptor.period)
+		return time.After(descriptor.Period)
 	}
 }

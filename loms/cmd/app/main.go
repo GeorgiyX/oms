@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"route256/libs/cron"
 	"route256/libs/db"
 	"route256/libs/middleware"
 	"route256/loms/internal/app/loms"
@@ -52,6 +53,10 @@ func main() {
 			),
 		),
 	)
+
+	c := cron.New()
+	defer s.Stop()
+	c.Add(useCaseInstance.GetCancelOrdersByTimeoutCron())
 
 	reflection.Register(s)
 	desc.RegisterLomsServer(s, serviceInstance)

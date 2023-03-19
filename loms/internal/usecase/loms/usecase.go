@@ -2,6 +2,8 @@ package loms
 
 import (
 	"context"
+
+	"route256/libs/cron"
 	"route256/libs/db"
 	"route256/loms/internal/model"
 	"route256/loms/internal/repositories/order"
@@ -16,6 +18,8 @@ type UseCase interface {
 	Stock(ctx context.Context, sku uint32) ([]model.StocksItemInfo, error)
 	CreateOrder(ctx context.Context, user int64, items []model.OrderItemToCreate) (int64, error)
 	ListOrder(ctx context.Context, orderID int64) (model.Order, error)
+	CancelOrdersByTimeout(ctx context.Context) error
+	GetCancelOrdersByTimeoutCron() cron.TaskDescriptor
 }
 
 type useCase struct {
