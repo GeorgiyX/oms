@@ -20,19 +20,17 @@ func (u *useCase) ListCart(ctx context.Context, user int64) (model.Cart, error) 
 	cart := model.Cart{}
 	cart.Items = make([]*model.CartItem, 0, len(items))
 	cartMutex := sync.Mutex{}
-	cartMutex := sync.Mutex{}
 	pool := workerpool.New(maxWorkers, len(items))
 
 	for _, item := range items {
-		pool.Schedule(ctx, func(ctx context.Context) {
+		pool.Schedule(ctx, func(ctx context.Context) error {
 			product, err := u.productResolver.Resolve(ctx, item.Sku)
 			if err != nil {
-				return model.Cart{}, errors.WithMessage(err, "sku resolve")
+				return errors.WithMessage(err, "sku resolve")
 			}
 
 			cartMutex.Lock()
 			defer cartMutex.Unlock()
-
 			cart.Items = append(cart.Items, &model.CartItem{
 				Sku:   item.Sku,
 				Count: item.Count,
@@ -40,6 +38,7 @@ func (u *useCase) ListCart(ctx context.Context, user int64) (model.Cart, error) 
 				Price: product.Price,
 			})
 			cart.TotalPrice += product.Price * item.Count
+			return nil
 		})
 
 	}
