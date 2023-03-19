@@ -28,8 +28,8 @@ func TestCron(t *testing.T) {
 		c := New()
 		firstCallFlag := &atomic.Bool{}
 		secondCallFlag := &atomic.Bool{}
-		c.Add(gofakeit.MinecraftFood(), newTaskDesc(firstCallFlag, nil, nil))
-		c.Add(gofakeit.MinecraftFood(), newTaskDesc(secondCallFlag, nil, nil))
+		c.Add(newTaskDesc(firstCallFlag, nil, nil))
+		c.Add(newTaskDesc(secondCallFlag, nil, nil))
 		c.Stop()
 		require.True(t, firstCallFlag.Load())
 		require.True(t, secondCallFlag.Load())
@@ -40,8 +40,8 @@ func TestCron(t *testing.T) {
 		firstCallFlag := &atomic.Bool{}
 		secondCallFlag := &atomic.Bool{}
 		secondCallFlagErr := &atomic.Bool{}
-		c.Add(gofakeit.MinecraftFood(), newTaskDesc(firstCallFlag, nil, nil))
-		c.Add(gofakeit.MinecraftFood(), newTaskDesc(secondCallFlag, errors.New(gofakeit.MinecraftBiome()), func(err error) {
+		c.Add(newTaskDesc(firstCallFlag, nil, nil))
+		c.Add(newTaskDesc(secondCallFlag, errors.New(gofakeit.MinecraftBiome()), func(err error) {
 			require.Error(t, err)
 			secondCallFlagErr.Store(true)
 		}))

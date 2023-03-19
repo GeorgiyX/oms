@@ -17,9 +17,11 @@ const (
 type Task func(ctx context.Context) error
 type ErrCallBack func(err error)
 
+var _ Cron = (*cron)(nil)
+
 type Cron interface {
-	Add(name string, descriptor TaskDescriptor)
-	Close()
+	Add(descriptor TaskDescriptor)
+	Stop()
 }
 
 type TaskDescriptor struct {
@@ -43,7 +45,7 @@ func New() *cron {
 	}
 }
 
-func (c *cron) Add(name string, descriptor TaskDescriptor) {
+func (c *cron) Add(descriptor TaskDescriptor) {
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
