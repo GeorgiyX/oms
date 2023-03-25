@@ -37,8 +37,8 @@ func (r *repository) AddToOrder(ctx context.Context, items []model.OrderItemDB, 
 	return nil
 }
 
-func (r *repository) SetOrderStatus(ctx context.Context, order int64, status model.OrderStatus) error {
-	const query = `UPDATE order_info SET status = $2 WHERE id = $1;`
+func (r *repository) SetOrderStatuses(ctx context.Context, order []int64, status model.OrderStatus) error {
+	const query = `UPDATE order_info SET status = $2 WHERE id = ANY($1::BIGINT[]) RETURNING id;`
 
 	resp, err := r.db.Exec(ctx, query, order, status)
 	if err != nil {
@@ -75,4 +75,16 @@ func (r *repository) GetOrderItems(ctx context.Context, order int64) ([]model.Or
 	}
 
 	return items, nil
+}
+
+func (r *repository) GetExpiredPaymentOrders(ctx context.Context) ([]int64, error) {
+	const query = `SELECT id FROM order_info WHERE status = status_awaiting_payment() AND now() - created_at > INTERVAL '10 min';`
+
+	var ids []int64
+	err := r.db.Select(ctx, &ids, query)
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot fetch orders ids")
+	}
+
+	return ids, nil
 }

@@ -41,8 +41,9 @@ func main() {
 	txDB := db.NewPgxPoolDB(pool)
 
 	opts := grpc.WithTransportCredentials(insecure.NewCredentials())
+	interceptor := grpc.WithChainUnaryInterceptor(middleware.RateLimiterInterceptor())
 
-	connLoms, err := grpc.Dial(config.Instance.Services.Loms, opts)
+	connLoms, err := grpc.Dial(config.Instance.Services.Loms, opts, interceptor)
 	if err != nil {
 		log.Fatalf("failed to connect to loms: %v", err)
 	}

@@ -59,13 +59,13 @@ func (r *repository) ReserveNext(ctx context.Context, sku uint32, count uint32, 
 	return remain, nil
 }
 
-func (r *repository) CancelReserve(ctx context.Context, order int64) error {
+func (r *repository) CancelReserves(ctx context.Context, order []int64) error {
 	const query = `
 	WITH cancel_reserve AS (
 		UPDATE warehouse w SET available_to_order = w.available_to_order + r.count
-		FROM reserve r WHERE w.warehouse_id = r.warehouse_id AND w.sku = r.sku AND r.fk_order_info_id = $1
+		FROM reserve r WHERE w.warehouse_id = r.warehouse_id AND w.sku = r.sku AND r.fk_order_info_id = ANY($1::BIGINT[])
 	)
-	DELETE FROM reserve WHERE fk_order_info_id = $1;`
+	DELETE FROM reserve WHERE fk_order_info_id = ANY($1::BIGINT[]);`
 
 	resp, err := r.db.Exec(ctx, query, order)
 	if err != nil {

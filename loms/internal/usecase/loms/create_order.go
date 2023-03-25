@@ -52,7 +52,7 @@ func (u *useCase) CreateOrder(ctx context.Context, user int64, items []model.Ord
 			status = model.Failed
 		}
 
-		err = u.orderRepo.SetOrderStatus(ctxTx, orderID, status)
+		err = u.orderRepo.SetOrderStatuses(ctxTx, []int64{orderID}, status)
 		if err != nil {
 			return errors.Wrap(err, "set order status")
 		}
