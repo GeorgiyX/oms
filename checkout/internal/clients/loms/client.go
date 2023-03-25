@@ -1,5 +1,7 @@
 package loms
 
+//go:generate mockery --case underscore --name StocksChecker --with-expecter
+
 import (
 	"context"
 	"route256/checkout/internal/convert"

@@ -1,5 +1,7 @@
 package cart
 
+//go:generate mockery --case underscore --name Repository --with-expecter
+
 import (
 	"context"
 	"route256/checkout/internal/model"

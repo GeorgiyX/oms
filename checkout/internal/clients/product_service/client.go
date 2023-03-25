@@ -1,5 +1,7 @@
 package product_service
 
+//go:generate mockery --case underscore --name SkuResolver --with-expecter
+
 import (
 	"context"
 	"route256/checkout/internal/config"

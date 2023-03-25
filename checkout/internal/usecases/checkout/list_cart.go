@@ -23,6 +23,7 @@ func (u *useCase) ListCart(ctx context.Context, user int64) (model.Cart, error) 
 	pool := workerpool.New(maxWorkers, len(items))
 
 	for _, item := range items {
+		item := item
 		pool.Schedule(ctx, func(ctx context.Context) error {
 			product, err := u.productResolver.Resolve(ctx, item.Sku)
 			if err != nil {
