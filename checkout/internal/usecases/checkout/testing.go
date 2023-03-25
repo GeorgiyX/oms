@@ -15,7 +15,7 @@ type fixture struct {
 	stocksCheckerMock   *mockLoms.StocksChecker
 	productResolverMock *mocksProductService.SkuResolver
 	repoMock            *mocksRepository.Repository
-	facade              *useCase
+	useCase             *useCase
 }
 
 func tearUp(t *testing.T) *fixture {
@@ -25,10 +25,10 @@ func tearUp(t *testing.T) *fixture {
 		stocksCheckerMock:   mockLoms.NewStocksChecker(t),
 		productResolverMock: mocksProductService.NewSkuResolver(t),
 		repoMock:            mocksRepository.NewRepository(t),
-		facade:              nil,
+		useCase:             nil,
 	}
 
-	fx.facade = New(Config{
+	fx.useCase = New(Config{
 		StocksChecker: fx.stocksCheckerMock,
 		SkuResolver:   fx.productResolverMock,
 		Repository:    fx.repoMock,

@@ -4,3 +4,4 @@ config.yaml
 vendor-proto/
 generate/
 .obsidian/
+coverage.out

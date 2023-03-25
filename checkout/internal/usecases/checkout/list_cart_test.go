@@ -1,12 +1,14 @@
 package checkout
 
 import (
+	"sort"
+	"testing"
+
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"route256/checkout/internal/model"
-	"sort"
-	"testing"
 )
 
 const itemCount = 10
@@ -56,6 +58,10 @@ func TestListCart(t *testing.T) {
 	userID := gofakeit.Int64()
 	items := genItems(itemCount, userID)
 	cartExp, productsMapping := toCart(items)
+	emptyCartExp := model.Cart{
+		Items:      nil,
+		TotalPrice: 0,
+	}
 
 	t.Run("should correctly return cart items", func(t *testing.T) {
 		fx := tearUp(t)
@@ -63,7 +69,7 @@ func TestListCart(t *testing.T) {
 		for _, item := range items {
 			fx.productResolverMock.EXPECT().Resolve(mock.Anything, item.Sku).Return(productsMapping[item.Sku], nil).Once()
 		}
-		cartAct, err := fx.facade.ListCart(fx.ctx, userID)
+		cartAct, err := fx.useCase.ListCart(fx.ctx, userID)
 
 		require.NoError(t, err)
 		require.NotNil(t, cartAct)
@@ -79,5 +85,24 @@ func TestListCart(t *testing.T) {
 			require.Equal(t, cartExp.Items[i].Name, cartAct.Items[i].Name)
 			require.Equal(t, cartExp.Items[i].Count, cartAct.Items[i].Count)
 		}
+	})
+
+	t.Run("should fail if repo list fail", func(t *testing.T) {
+		fx := tearUp(t)
+		fx.repoMock.EXPECT().List(mock.Anything, userID).Return(nil, errors.New(gofakeit.Gamertag())).Once()
+		cartAct, err := fx.useCase.ListCart(fx.ctx, userID)
+
+		require.Error(t, err)
+		require.Equal(t, emptyCartExp, cartAct)
+	})
+
+	t.Run("should fail if item resolve fail", func(t *testing.T) {
+		fx := tearUp(t)
+		fx.repoMock.EXPECT().List(mock.Anything, userID).Return(items, nil).Once()
+		fx.productResolverMock.EXPECT().Resolve(mock.Anything, mock.Anything).Return(nil, errors.New(gofakeit.Gamertag()))
+		cartAct, err := fx.useCase.ListCart(fx.ctx, userID)
+
+		require.Error(t, err)
+		require.Equal(t, emptyCartExp, cartAct)
 	})
 }
