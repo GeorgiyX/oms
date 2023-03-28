@@ -1,5 +1,7 @@
 package warehouse
 
+//go:generate mockery --case underscore --name Repository --with-expecter
+
 import (
 	"context"
 	"route256/libs/db"

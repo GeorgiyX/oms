@@ -28,7 +28,8 @@ func (u *useCase) CreateOrder(ctx context.Context, user int64, items []model.Ord
 		}
 
 		for _, item := range items {
-			isEnough, err := u.warehouseRepo.IsEnough(ctxTx, item.SKU, item.Count)
+			var isEnough bool
+			isEnough, err = u.warehouseRepo.IsEnough(ctxTx, item.SKU, item.Count)
 			if err != nil {
 				return errors.Wrap(err, "check is enough")
 			}

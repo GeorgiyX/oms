@@ -1,5 +1,7 @@
 package db
 
+//go:generate mockery --case underscore --name TxDB --with-expecter
+
 import (
 	"context"
 )
