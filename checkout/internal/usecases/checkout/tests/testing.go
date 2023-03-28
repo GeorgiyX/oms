@@ -7,6 +7,7 @@ import (
 	mockLoms "route256/checkout/internal/clients/loms/mocks"
 	mocksProductService "route256/checkout/internal/clients/product_service/mocks"
 	mocksRepository "route256/checkout/internal/repositories/cart/mocks"
+	"route256/checkout/internal/usecases/checkout"
 )
 
 type fixture struct {
@@ -15,7 +16,7 @@ type fixture struct {
 	stocksCheckerMock   *mockLoms.StocksChecker
 	productResolverMock *mocksProductService.SkuResolver
 	repoMock            *mocksRepository.Repository
-	useCase             *useCase
+	useCase             checkout.UseCase
 }
 
 func tearUp(t *testing.T) *fixture {
@@ -28,7 +29,7 @@ func tearUp(t *testing.T) *fixture {
 		useCase:             nil,
 	}
 
-	fx.useCase = New(Config{
+	fx.useCase = checkout.New(checkout.Config{
 		StocksChecker: fx.stocksCheckerMock,
 		SkuResolver:   fx.productResolverMock,
 		Repository:    fx.repoMock,
