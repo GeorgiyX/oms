@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-
 	"route256/libs/db"
 	"route256/loms/internal/model"
 )
