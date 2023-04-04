@@ -6,11 +6,14 @@ import (
 	"route256/libs/cron"
 	"route256/libs/db"
 	"route256/loms/internal/model"
+	"route256/loms/internal/notifier"
+	notificationOutbox "route256/loms/internal/repositories/notification_outbox"
 	"route256/loms/internal/repositories/order"
 	"route256/loms/internal/repositories/warehouse"
 )
 
 var _ UseCase = (*useCase)(nil)
+var _ notifier.NotificationCallBack = (*useCase)(nil)
 
 type UseCase interface {
 	CancelOrder(ctx context.Context, orderID int64) error
@@ -20,17 +23,21 @@ type UseCase interface {
 	ListOrder(ctx context.Context, orderID int64) (model.Order, error)
 	CancelOrdersByTimeout(ctx context.Context) error
 	GetCancelOrdersByTimeoutCron() cron.TaskDescriptor
+	SetNotifier(notifier notifier.Notifier)
 }
 
 type useCase struct {
-	warehouseRepo warehouse.Repository
-	orderRepo     order.Repository
-	db            db.TxDB
+	warehouseRepo      warehouse.Repository
+	orderRepo          order.Repository
+	notifierOutboxRepo notificationOutbox.Repository
+	notifier           notifier.Notifier
+	db                 db.TxDB
 }
 
 type Config struct {
 	WarehouseRepository warehouse.Repository
 	OrderRepository     order.Repository
+	Notifier            notifier.Notifier
 	TxDB                db.TxDB
 }
 
@@ -38,6 +45,7 @@ func New(config Config) *useCase {
 	return &useCase{
 		warehouseRepo: config.WarehouseRepository,
 		orderRepo:     config.OrderRepository,
+		notifier:      config.Notifier,
 		db:            config.TxDB,
 	}
 }

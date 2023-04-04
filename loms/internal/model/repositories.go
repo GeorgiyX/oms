@@ -27,3 +27,11 @@ type Reserve struct {
 	Count       uint32 `db:"count"`
 	OrderInfoID int64  `db:"fk_order_info_id"`
 }
+
+type StatusChangeDatabase struct {
+	OrderID            int64              `db:"fk_order_info_id"`
+	CreatedAt          time.Time          `db:"created_at"`
+	SendStatus         int16              `db:"send_status"`
+	NotificationStatus NotificationStatus `db:"notification_status"`
+	Total              int64              `db:"total"`
+}

@@ -13,5 +13,10 @@ func (u *useCase) OrderPayed(ctx context.Context, orderID int64) error {
 		return errors.Wrap(err, "set order status")
 	}
 
+	err = u.notifier.SendNotification(orderID, model.Payed)
+	if err != nil {
+		return errors.Wrap(err, "send notification")
+	}
+
 	return nil
 }

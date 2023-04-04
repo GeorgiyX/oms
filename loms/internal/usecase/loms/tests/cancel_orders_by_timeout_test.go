@@ -23,6 +23,7 @@ func TestCancelOrdersByTimeout(t *testing.T) {
 		fx.orderRepoMock.EXPECT().GetExpiredPaymentOrders(mock.Anything).Return(ordersID, nil).Once()
 		fx.warehouseRepoMock.EXPECT().CancelReserves(mock.Anything, ordersID).Return(nil).Once()
 		fx.orderRepoMock.EXPECT().SetOrderStatuses(mock.Anything, ordersID, model.Cancelled).Return(nil).Once()
+		fx.mockSendNotification(nil, ordersID, model.Cancelled)
 
 		err := fx.useCase.CancelOrdersByTimeout(fx.ctx)
 		require.NoError(t, err)

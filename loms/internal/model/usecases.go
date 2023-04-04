@@ -50,3 +50,24 @@ type OrderItemToCreate struct {
 	SKU   uint32
 	Count uint32
 }
+
+type NotificationStatus int16
+
+const (
+	InvalidNotificationStatus NotificationStatus = iota
+	PendingNotificationStatus
+	WaitConfirmationNotificationStatus
+	SendNotificationStatus
+)
+
+func (s NotificationStatus) String() string {
+	switch s {
+	case PendingNotificationStatus:
+		return "pending"
+	case WaitConfirmationNotificationStatus:
+		return "wait_confirmation"
+	case SendNotificationStatus:
+		return "send"
+	}
+	return fmt.Sprintf("invalid (%d)", s)
+}

@@ -58,6 +58,11 @@ func (u *useCase) CreateOrder(ctx context.Context, user int64, items []model.Ord
 			return errors.Wrap(err, "set order status")
 		}
 
+		err = u.notifier.SendNotification(orderID, status)
+		if err != nil {
+			return errors.Wrap(err, "send notification")
+		}
+
 		return nil
 	})
 

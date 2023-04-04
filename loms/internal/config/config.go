@@ -6,8 +6,10 @@ import (
 )
 
 type Config struct {
-	DSN      string `yaml:"dsn"`
-	Services struct {
+	DSN               string   `yaml:"dsn"`
+	NotificationTopic string   `yaml:"notification_topic"`
+	Brokers           []string `yaml:"brokers"`
+	Services          struct {
 		Loms string `yaml:"loms"`
 	} `yaml:"services"`
 }

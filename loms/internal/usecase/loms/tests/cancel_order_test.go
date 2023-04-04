@@ -19,6 +19,7 @@ func TestCancelOrder(t *testing.T) {
 		fx.mockDB(1, false)
 		fx.warehouseRepoMock.EXPECT().CancelReserves(mock.Anything, []int64{orderID}).Return(nil).Once()
 		fx.orderRepoMock.EXPECT().SetOrderStatuses(mock.Anything, []int64{orderID}, model.Cancelled).Return(nil).Once()
+		fx.notifierMock.EXPECT().SendNotification(orderID, model.Cancelled).Return(nil).Once()
 
 		err := fx.useCase.CancelOrder(fx.ctx, orderID)
 		require.NoError(t, err)
