@@ -9,6 +9,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	OffsetNewest int64 = -1
+	OffsetOldest int64 = -2
+)
+
 type MessageHandler func(ctx context.Context, message *sarama.ConsumerMessage) error
 
 var _ ConsumerGroup = (*consumerGroup)(nil)

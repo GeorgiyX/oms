@@ -1,0 +1,4 @@
+notification_topic: "notification_topic"
+brokers:
+  - "kafka1:9091"
+  - "kafka1:9092"

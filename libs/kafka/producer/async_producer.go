@@ -39,6 +39,9 @@ func NewAsyncProducer(cfg ConfigProducer) (*asyncProducer, error) {
 	config.Producer.Return.Successes = true
 	config.Producer.Return.Errors = true
 
+	cfg.SuccessCallBack = wrapSuccessCallBack(cfg.SuccessCallBack)
+	cfg.ErrorCallBack = wrapErrorCallBack(cfg.ErrorCallBack)
+
 	producer, err := sarama.NewAsyncProducer(cfg.Brokers, config)
 	if err != nil {
 		return nil, errors.Wrap(err, "create async producer")
@@ -91,4 +94,22 @@ func logSendErr(message *sarama.ProducerMessage, err error) {
 func logSend(message *sarama.ProducerMessage) {
 	key, _ := message.Key.Encode()
 	log.Printf("Message send: timestamp = %v, key = %s, topic = %s, partition = %s, offset = %s", message.Timestamp, string(key), message.Topic, message.Partition, message.Offset)
+}
+
+func wrapErrorCallBack(fn ErrorCallBack) ErrorCallBack {
+	return func(ctx context.Context, message *sarama.ProducerMessage, err error) {
+		if fn == nil {
+			log.Println("err happen, no err handler")
+		}
+		fn(ctx, message, err)
+	}
+}
+
+func wrapSuccessCallBack(fn SuccessCallBack) SuccessCallBack {
+	return func(ctx context.Context, message *sarama.ProducerMessage) {
+		if fn == nil {
+			log.Println("message send, no success handler")
+		}
+		fn(ctx, message)
+	}
 }
