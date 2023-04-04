@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"log"
 
 	"github.com/Shopify/sarama"
 	"github.com/pkg/errors"
@@ -18,7 +19,7 @@ type ErrorCallBack func(ctx context.Context, message *sarama.ProducerMessage, er
 type SuccessCallBack func(ctx context.Context, message *sarama.ProducerMessage)
 type Closer func() error
 
-type Config struct {
+type ConfigProducer struct {
 	ErrorCallBack
 	SuccessCallBack
 	Topic   string
@@ -30,7 +31,7 @@ type asyncProducer struct {
 	topic    string
 }
 
-func NewAsyncProducer(cfg Config) (*asyncProducer, error) {
+func NewAsyncProducer(cfg ConfigProducer) (*asyncProducer, error) {
 	config := sarama.NewConfig()
 	config.Producer.Partitioner = sarama.NewHashPartitioner
 	config.Producer.RequiredAcks = sarama.WaitForAll // exactly once
@@ -45,6 +46,7 @@ func NewAsyncProducer(cfg Config) (*asyncProducer, error) {
 
 	go func() {
 		for errIn := range producer.Errors() { // after retries
+			logSendErr(errIn.Msg, errIn.Err)
 			if cfg.ErrorCallBack == nil {
 				return
 			}
@@ -53,11 +55,12 @@ func NewAsyncProducer(cfg Config) (*asyncProducer, error) {
 	}()
 
 	go func() {
-		for msg := range producer.Successes() {
+		for message := range producer.Successes() {
+			logSend(message)
 			if cfg.SuccessCallBack == nil {
 				return
 			}
-			cfg.SuccessCallBack(context.Background(), msg)
+			cfg.SuccessCallBack(context.Background(), message)
 		}
 	}()
 
@@ -78,4 +81,14 @@ func (a *asyncProducer) Send(key string, message []byte) {
 
 func (a *asyncProducer) Close() error {
 	return a.producer.Close()
+}
+
+func logSendErr(message *sarama.ProducerMessage, err error) {
+	key, _ := message.Key.Encode()
+	log.Printf("Message send error: timestamp = %v, key = %s, err = %s, topic = %s, partition = %s, offset = %s", message.Timestamp, string(key), err.Error(), message.Topic, message.Partition, message.Offset)
+}
+
+func logSend(message *sarama.ProducerMessage) {
+	key, _ := message.Key.Encode()
+	log.Printf("Message send: timestamp = %v, key = %s, topic = %s, partition = %s, offset = %s", message.Timestamp, string(key), message.Topic, message.Partition, message.Offset)
 }
