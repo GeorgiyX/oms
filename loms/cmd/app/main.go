@@ -6,7 +6,6 @@ import (
 	"net"
 	"route256/libs/cron"
 	"route256/libs/db"
-	kafka "route256/libs/kafka/producer"
 	"route256/libs/middleware"
 	"route256/loms/internal/app/loms"
 	"route256/loms/internal/config"
@@ -54,14 +53,6 @@ func main() {
 	}
 	defer notifierInstance.Close()
 	useCaseInstance.SetNotifier(notifierInstance)
-
-	producer, err := kafka.NewAsyncProducer(kafka.ConfigProducer{
-		ErrorCallBack:   nil,
-		SuccessCallBack: nil,
-		Topic:           config.Instance.NotificationTopic,
-		Brokers:         config.Instance.Brokers,
-	})
-	defer producer.Close()
 
 	serviceInstance := loms.New(useCaseInstance)
 
