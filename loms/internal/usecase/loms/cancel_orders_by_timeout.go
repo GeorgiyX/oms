@@ -32,6 +32,11 @@ func (u *useCase) CancelOrdersByTimeout(ctx context.Context) error {
 		}
 
 		for _, orderID := range orders {
+			err = u.notifierOutboxRepo.ScheduleNotification(ctx, orderID, model.Cancelled)
+			if err != nil {
+				return errors.Wrap(err, "schedule notification")
+			}
+
 			err = u.notifier.SendNotification(orderID, model.Cancelled)
 			if err != nil {
 				return errors.Wrap(err, "send notification")

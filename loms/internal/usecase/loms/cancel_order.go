@@ -20,6 +20,11 @@ func (u *useCase) CancelOrder(ctx context.Context, orderID int64) error {
 			return errors.Wrap(err, "set order status")
 		}
 
+		err = u.notifierOutboxRepo.ScheduleNotification(ctx, orderID, model.Cancelled)
+		if err != nil {
+			return errors.Wrap(err, "schedule notification")
+		}
+
 		err = u.notifier.SendNotification(orderID, model.Cancelled)
 		if err != nil {
 			return errors.Wrap(err, "send notification")

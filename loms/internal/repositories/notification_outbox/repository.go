@@ -12,7 +12,7 @@ var _ Repository = (*notificationOutbox)(nil)
 
 type Repository interface {
 	GetPendingNotifications(ctx context.Context, offset, limit uint64) ([]model.StatusChangeDatabase, error)
-	ScheduleNotification(ctx context.Context, notification model.StatusChangeDatabase) error
+	ScheduleNotification(ctx context.Context, orderID int64, status model.OrderStatus) error
 	SetStatus(ctx context.Context, orderID int64, notificationStatus model.NotificationStatus) error
 }
 
