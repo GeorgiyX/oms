@@ -2,6 +2,8 @@ package tests
 
 import (
 	"context"
+	mocksDB "route256/libs/db/mocks"
+	"route256/loms/internal/model"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -9,7 +11,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"route256/libs/db"
-	mocksDB "route256/libs/db/mocks"
+	mocksNotifier "route256/loms/internal/notifier/mocks"
 	mocksOrderRepo "route256/loms/internal/repositories/order/mocks"
 	mocksWarehouseRepo "route256/loms/internal/repositories/warehouse/mocks"
 	"route256/loms/internal/usecase/loms"
@@ -20,6 +22,7 @@ type fixture struct {
 	ctx               context.Context
 	warehouseRepoMock *mocksWarehouseRepo.Repository
 	orderRepoMock     *mocksOrderRepo.Repository
+	notifierMock      *mocksNotifier.Notifier
 	dbMock            *mocksDB.TxDB
 	useCase           loms.UseCase
 }
@@ -30,6 +33,7 @@ func tearUp(t *testing.T) *fixture {
 		ctx:               context.Background(),
 		warehouseRepoMock: mocksWarehouseRepo.NewRepository(t),
 		orderRepoMock:     mocksOrderRepo.NewRepository(t),
+		notifierMock:      mocksNotifier.NewNotifier(t),
 		dbMock:            mocksDB.NewTxDB(t),
 		useCase:           nil,
 	}
@@ -37,10 +41,17 @@ func tearUp(t *testing.T) *fixture {
 	fx.useCase = loms.New(loms.Config{
 		WarehouseRepository: fx.warehouseRepoMock,
 		OrderRepository:     fx.orderRepoMock,
+		Notifier:            fx.notifierMock,
 		TxDB:                fx.dbMock,
 	})
 
 	return fx
+}
+
+func (fx *fixture) mockSendNotification(err error, orderIDs []int64, status model.OrderStatus) {
+	for _, orderID := range orderIDs {
+		fx.notifierMock.EXPECT().SendNotification(orderID, status).Return(err).Once()
+	}
 }
 
 func (fx *fixture) mockDB(times int, isErr bool) {

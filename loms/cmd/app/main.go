@@ -9,6 +9,7 @@ import (
 	"route256/libs/middleware"
 	"route256/loms/internal/app/loms"
 	"route256/loms/internal/config"
+	"route256/loms/internal/notifier"
 	"route256/loms/internal/repositories/order"
 	"route256/loms/internal/repositories/warehouse"
 	loms2 "route256/loms/internal/usecase/loms"
@@ -41,9 +42,18 @@ func main() {
 		loms2.Config{
 			WarehouseRepository: warehouse.New(txDB),
 			OrderRepository:     order.New(txDB),
+			Notifier:            nil,
 			TxDB:                txDB,
 		},
 	)
+
+	notifierInstance, err := notifier.NewNotifier(useCaseInstance)
+	if err != nil {
+		log.Fatalf("create notifier: %v", err)
+	}
+	defer notifierInstance.Close()
+	useCaseInstance.SetNotifier(notifierInstance)
+
 	serviceInstance := loms.New(useCaseInstance)
 
 	s := grpc.NewServer(
@@ -57,6 +67,7 @@ func main() {
 	c := cron.New()
 	defer s.Stop()
 	c.Add(useCaseInstance.GetCancelOrdersByTimeoutCron())
+	c.Add(useCaseInstance.GetNotifyCron())
 
 	reflection.Register(s)
 	desc.RegisterLomsServer(s, serviceInstance)

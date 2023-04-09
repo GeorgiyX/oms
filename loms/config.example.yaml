@@ -1,3 +1,7 @@
 dsn: "host=pgbouncer-loms port=6434 user=loms password=password dbname=loms-db sslmode=disable"
+notification_topic: "notification_topic"
+brokers:
+  - "kafka1:9091"
+  - "kafka1:9092"
 services:
   loms: ":8082"

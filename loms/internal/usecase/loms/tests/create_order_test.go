@@ -41,6 +41,7 @@ func TestCreateOrder(t *testing.T) {
 			fx.warehouseRepoMock.EXPECT().ReserveNext(mock.Anything, item.SKU, item.Count, orderID).Return(0, nil).Once()
 		}
 		fx.orderRepoMock.EXPECT().SetOrderStatuses(mock.Anything, []int64{orderID}, model.AwaitingPayment).Return(nil).Once()
+		fx.notifierMock.EXPECT().SendNotification(orderID, model.AwaitingPayment).Return(nil).Once()
 
 		actOrderId, err := fx.useCase.CreateOrder(fx.ctx, user, items)
 		require.NoError(t, err)
@@ -73,6 +74,7 @@ func TestCreateOrder(t *testing.T) {
 		fx.warehouseRepoMock.EXPECT().IsEnough(mock.Anything, items[0].SKU, items[0].Count).Return(true, nil).Once()
 		fx.warehouseRepoMock.EXPECT().ReserveNext(mock.Anything, items[0].SKU, items[0].Count, orderID).Return(0, errGen).Once()
 		fx.orderRepoMock.EXPECT().SetOrderStatuses(mock.Anything, []int64{orderID}, model.Failed).Return(nil).Once()
+		fx.notifierMock.EXPECT().SendNotification(orderID, model.Failed).Return(nil).Once()
 
 		actOrderId, err := fx.useCase.CreateOrder(fx.ctx, user, items)
 		require.NoError(t, err)
