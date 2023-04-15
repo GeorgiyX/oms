@@ -12,6 +12,7 @@ type Config struct {
 	Services          struct {
 		Loms string `yaml:"loms"`
 	} `yaml:"services"`
+	Debug bool `json:"debug"`
 }
 
 var Instance Config

@@ -4,3 +4,4 @@ services:
   checkout: ":8081"
   loms: "loms:8082"
   product_service: "route256.pavl.uk:8082"
+debug: true

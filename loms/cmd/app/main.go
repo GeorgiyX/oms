@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"go.uber.org/zap"
 	"net"
 	"route256/libs/cron"
 	"route256/libs/db"
+	"route256/libs/logger"
 	"route256/libs/middleware"
 	"route256/loms/internal/app/loms"
 	"route256/loms/internal/config"
@@ -23,17 +25,23 @@ import (
 
 func main() {
 	config.Init()
+	logger.Init(config.Instance.Debug)
+
+	lg, err := logger.New(config.Instance.Debug)
+	if err != nil {
+		logger.Fatal("create logger", zap.Error(err))
+	}
 
 	ctx := context.Background()
 	pool, err := pgxpool.Connect(ctx, config.Instance.DSN)
 	if err != nil {
-		log.Fatalf("failed to connect to DB: %v", err)
+		logger.Fatal("failed to connect to DB", zap.Error(err))
 	}
 	defer pool.Close()
 
 	err = pool.Ping(ctx)
 	if err != nil {
-		log.Fatalf("unsuccess db ping: %v", err)
+		logger.Fatal("unsuccessful db ping", zap.Error(err))
 	}
 
 	txDB := db.NewPgxPoolDB(pool)
@@ -49,7 +57,7 @@ func main() {
 
 	notifierInstance, err := notifier.NewNotifier(useCaseInstance)
 	if err != nil {
-		log.Fatalf("create notifier: %v", err)
+		logger.Fatal("failed to сreate notifier", zap.Error(err))
 	}
 	defer notifierInstance.Close()
 	useCaseInstance.SetNotifier(notifierInstance)
@@ -59,7 +67,7 @@ func main() {
 	s := grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpcMiddleware.ChainUnaryServer(
-				middleware.LoggingInterceptor,
+				middleware.LoggingInterceptor(lg),
 			),
 		),
 	)
@@ -72,12 +80,12 @@ func main() {
 	reflection.Register(s)
 	desc.RegisterLomsServer(s, serviceInstance)
 
-	log.Printf("start \"loms\" checkout at %s\n", config.Instance.Services.Loms)
+	logger.Info(fmt.Sprintf("start \"loms\" checkout at %s\n", config.Instance.Services.Loms), zap.Error(err))
 	lis, err := net.Listen("tcp", config.Instance.Services.Loms)
 	if err != nil {
-		log.Fatalf("create tcp listener: %v", err)
+		logger.Fatal("create tcp listener", zap.Error(err))
 	}
 	if err = s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		logger.Fatal("failed to serve", zap.Error(err))
 	}
 }

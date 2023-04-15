@@ -5,3 +5,4 @@ brokers:
   - "kafka1:9092"
 services:
   loms: ":8082"
+debug: true
