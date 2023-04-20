@@ -9,7 +9,8 @@ type Config struct {
 	Token    string `yaml:"token"`
 	DSN      string `yaml:"dsn"`
 	Services struct {
-		Checkout       string `yaml:"checkout"`
+		CheckoutHTTP   string `yaml:"checkout_http"`
+		CheckoutGRPC   string `yaml:"checkout_grpc"`
 		Loms           string `yaml:"loms"`
 		ProductService string `yaml:"product_service"`
 	} `yaml:"services"`

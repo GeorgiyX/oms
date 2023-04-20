@@ -5,6 +5,7 @@ services:
     build: ./checkout/
     ports:
       - "8081:8081"
+      - "7081:7081"
     volumes:
       - ./checkout:/checkout # for config read
     networks:

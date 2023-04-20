@@ -3,14 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"net"
+	grpcServer "route256/libs/grpc/server"
 
-	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
 	"route256/checkout/internal/app/checkout"
 	"route256/checkout/internal/clients/loms"
 	productService "route256/checkout/internal/clients/product_service"
@@ -73,23 +71,18 @@ func main() {
 	useCaseInstance := checkout2.New(useCaseConfig)
 	serviceInstance := checkout.New(useCaseInstance)
 
-	s := grpc.NewServer(
-		grpc.UnaryInterceptor(
-			grpcMiddleware.ChainUnaryServer(
-				middleware.LoggingInterceptor(lg),
-			),
-		),
-	)
-
-	reflection.Register(s)
-	desc.RegisterCheckoutServer(s, serviceInstance)
-
-	logger.Info(fmt.Sprintf("start \"checkout\" checkout at %s\n", config.Instance.Services.Checkout), zap.Error(err))
-	lis, err := net.Listen("tcp", config.Instance.Services.Checkout)
+	server, err := grpcServer.NewServer("checkout", grpc.ChainUnaryInterceptor(
+		middleware.LoggingInterceptor(lg),
+	))
 	if err != nil {
-		logger.Fatal("create tcp listener", zap.Error(err))
+		logger.Fatal("create server", zap.Error(err))
 	}
-	if err = s.Serve(lis); err != nil {
+
+	server.RegisterService(&desc.Checkout_ServiceDesc, serviceInstance)
+
+	logger.Info(fmt.Sprintf("start \"checkout\" at %s\n", config.Instance.Services.CheckoutGRPC))
+	err = server.Serve(config.Instance.Services.CheckoutGRPC, config.Instance.Services.CheckoutHTTP)
+	if err != nil {
 		logger.Fatal("failed to serve", zap.Error(err))
 	}
 }

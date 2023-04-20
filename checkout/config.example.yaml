@@ -1,7 +1,8 @@
 token: "secret"
 dsn: "host=pgbouncer-checkout port=6433 user=checkout password=password dbname=checkout-db sslmode=disable"
 services:
-  checkout: ":8081"
+  checkout_grpc: ":8081"
+  checkout_http: ":7081"
   loms: "loms:8082"
   product_service: "route256.pavl.uk:8082"
 debug: true
