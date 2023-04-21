@@ -10,7 +10,8 @@ type Config struct {
 	NotificationTopic string   `yaml:"notification_topic"`
 	Brokers           []string `yaml:"brokers"`
 	Services          struct {
-		Loms string `yaml:"loms"`
+		LomsHTTP string `yaml:"loms_http"`
+		LomsGRPC string `yaml:"loms_grpc"`
 	} `yaml:"services"`
 	Debug bool `json:"debug"`
 }

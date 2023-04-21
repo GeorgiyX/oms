@@ -3,12 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	grpcServer "route256/libs/grpc/server"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+
 	"route256/checkout/internal/app/checkout"
 	"route256/checkout/internal/clients/loms"
 	productService "route256/checkout/internal/clients/product_service"
@@ -18,6 +17,8 @@ import (
 	desc "route256/checkout/pkg/checkout"
 	descProductService "route256/checkout/pkg/product-service"
 	"route256/libs/db"
+	grpcClient "route256/libs/grpc/client"
+	grpcServer "route256/libs/grpc/server"
 	"route256/libs/logger"
 	"route256/libs/middleware"
 	descLoms "route256/loms/pkg/loms"
@@ -46,17 +47,16 @@ func main() {
 
 	txDB := db.NewPgxPoolDB(pool)
 
-	opts := grpc.WithTransportCredentials(insecure.NewCredentials())
 	interceptor := grpc.WithChainUnaryInterceptor(middleware.RateLimiterInterceptor())
 
-	connLoms, err := grpc.Dial(config.Instance.Services.Loms, opts, interceptor)
+	connLoms, err := grpcClient.NewClientConnection(config.Instance.Services.Loms, interceptor)
 	if err != nil {
 		logger.Fatal("failed to connect to loms", zap.Error(err))
 	}
 	defer connLoms.Close()
 	lomsClient := descLoms.NewLomsClient(connLoms)
 
-	connProduct, err := grpc.Dial(config.Instance.Services.ProductService, opts)
+	connProduct, err := grpcClient.NewClientConnection(config.Instance.Services.ProductService)
 	if err != nil {
 		logger.Fatal("failed to connect to product service", zap.Error(err))
 	}

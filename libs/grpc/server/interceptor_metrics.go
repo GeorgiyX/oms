@@ -19,7 +19,7 @@ var (
 	HistogramResponseTime = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "homework",
 		Subsystem: "grpc",
-		Name:      "histogram_response_time_seconds",
+		Name:      "histogram_server_response_time_seconds",
 		Buckets:   prometheus.ExponentialBuckets(0.0001, 2, 16),
 	},
 		[]string{"method", "status"},

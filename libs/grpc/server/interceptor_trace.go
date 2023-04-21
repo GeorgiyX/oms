@@ -7,10 +7,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/uber/jaeger-client-go"
 	"github.com/uber/jaeger-client-go/config"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"route256/libs/logger"
 )
 
 func initTracing(serviceName string) error {
@@ -43,8 +45,10 @@ func TraceInterceptor() grpc.UnaryServerInterceptor {
 				"x-trace-id": spanContext.TraceID().String(),
 			})
 
-			grpc.SetHeader(ctx, md)
-			//ctx = metadata.NewOutgoingContext(ctx, md)
+			err := grpc.SetHeader(ctx, md)
+			if err != nil {
+				logger.Warn("can't set trace id metadata header", zap.Error(err))
+			}
 		}
 
 		res, err := handler(ctx, req)

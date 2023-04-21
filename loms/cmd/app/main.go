@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"go.uber.org/zap"
-	"net"
 	"route256/libs/cron"
 	"route256/libs/db"
+	grpcServer "route256/libs/grpc/server"
 	"route256/libs/logger"
 	"route256/libs/middleware"
 	"route256/loms/internal/app/loms"
@@ -17,10 +17,8 @@ import (
 	loms2 "route256/loms/internal/usecase/loms"
 	desc "route256/loms/pkg/loms"
 
-	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -63,29 +61,23 @@ func main() {
 	useCaseInstance.SetNotifier(notifierInstance)
 
 	serviceInstance := loms.New(useCaseInstance)
-
-	s := grpc.NewServer(
-		grpc.UnaryInterceptor(
-			grpcMiddleware.ChainUnaryServer(
-				middleware.LoggingInterceptor(lg),
-			),
-		),
-	)
-
 	c := cron.New()
-	defer s.Stop()
+	defer c.Stop()
 	c.Add(useCaseInstance.GetCancelOrdersByTimeoutCron())
 	c.Add(useCaseInstance.GetNotifyCron())
 
-	reflection.Register(s)
-	desc.RegisterLomsServer(s, serviceInstance)
-
-	logger.Info(fmt.Sprintf("start \"loms\" checkout at %s\n", config.Instance.Services.Loms), zap.Error(err))
-	lis, err := net.Listen("tcp", config.Instance.Services.Loms)
+	server, err := grpcServer.NewServer("loms", grpc.ChainUnaryInterceptor(
+		middleware.LoggingInterceptor(lg),
+	))
 	if err != nil {
-		logger.Fatal("create tcp listener", zap.Error(err))
+		logger.Fatal("create server", zap.Error(err))
 	}
-	if err = s.Serve(lis); err != nil {
+
+	server.RegisterService(&desc.Loms_ServiceDesc, serviceInstance)
+
+	logger.Info(fmt.Sprintf("start \"loms\" at %s\n", config.Instance.Services.LomsGRPC))
+	err = server.Serve(config.Instance.Services.LomsGRPC, config.Instance.Services.LomsHTTP)
+	if err != nil {
 		logger.Fatal("failed to serve", zap.Error(err))
 	}
 }
