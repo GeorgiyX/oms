@@ -2,7 +2,6 @@ package grpc_server
 
 import (
 	"context"
-	"fmt"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/pkg/errors"
@@ -39,15 +38,12 @@ func initTracing(serviceName string, reporter string) error {
 }
 
 func newRootSpan(ctx context.Context, method string) (opentracing.Span, context.Context) {
-	logger.Info("newRootSpan")
 	span, ctx := opentracing.StartSpanFromContext(ctx, method)
 	spanContext, ok := span.Context().(jaeger.SpanContext)
 	if !ok {
 		logger.Warn("can't cast span context to jaeger.SpanContext")
 		return span, ctx
 	}
-
-	logger.Info("newRootSpan: " + spanContext.TraceID().String())
 
 	ctx = metadata.AppendToOutgoingContext(ctx, TraceHeader, spanContext.TraceID().String())
 
@@ -64,29 +60,33 @@ func newRootSpan(ctx context.Context, method string) (opentracing.Span, context.
 }
 
 func attachToRootSpan(ctx context.Context, method, trace, span string) (opentracing.Span, context.Context) {
-	logger.Info(fmt.Sprintf("attachToRootSpan: %s, %s", trace, span))
 	ctxString := trace + ":" + span + ":0:0"
 	spanContext, err := jaeger.ContextFromString(ctxString)
 	if err != nil {
 		logger.Warn("can't create span context", zap.Error(err))
 		return newRootSpan(ctx, method)
 	}
-	logger.Info("attachToRootSpan - StartSpanFromContext")
+
 	ctx = metadata.AppendToOutgoingContext(ctx, TraceHeader, spanContext.TraceID().String())
 	return opentracing.StartSpanFromContext(ctx, method, opentracing.ChildOf(spanContext))
 }
 
+// newServiceSpan search traceId and spanId in incoming metadata and if its found create span
+// linked with external span. Otherwise, create completely new span.
+// In both cases write traceId to outgoing context.
+func newServiceSpan(ctx context.Context, method string) (opentracing.Span, context.Context) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok || len(md.Get(TraceHeader)) == 0 || len(md.Get(SpanHeader)) == 0 {
+		return newRootSpan(ctx, method)
+	}
+	traceID := md.Get(TraceHeader)[0]
+	spanID := md.Get(SpanHeader)[0]
+	return attachToRootSpan(ctx, method, traceID, spanID)
+}
+
 func TraceInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		var span opentracing.Span
-		md, ok := metadata.FromIncomingContext(ctx)
-		if !ok || len(md.Get(TraceHeader)) == 0 || len(md.Get(SpanHeader)) == 0 {
-			span, ctx = newRootSpan(ctx, info.FullMethod)
-		} else {
-			traceID := md.Get(TraceHeader)[0]
-			spanID := md.Get(SpanHeader)[0]
-			span, ctx = attachToRootSpan(ctx, info.FullMethod, traceID, spanID)
-		}
+		span, ctx := newServiceSpan(ctx, info.FullMethod)
 		defer span.Finish()
 
 		span.SetTag("operation", info.FullMethod)

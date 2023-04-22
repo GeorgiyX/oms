@@ -47,14 +47,9 @@ func (r *repository) List(ctx context.Context, user int64) ([]model.CartItemDB, 
 func (r *repository) RemoveByUser(ctx context.Context, user int64) error {
 	const query = `DELETE FROM cart WHERE user_id = $1`
 
-	resp, err := r.db.Exec(ctx, query, user)
+	_, err := r.db.Exec(ctx, query, user)
 	if err != nil {
 		return errors.Wrap(err, "cannot remove user cart items")
-	}
-
-	affected := resp.RowsAffected()
-	if affected != 1 {
-		return errors.New("nothing was deleted")
 	}
 
 	return nil

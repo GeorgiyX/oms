@@ -2,15 +2,16 @@ package grpc_server
 
 import (
 	"context"
+	"net"
+	"net/http"
+	"sync"
+
 	"github.com/hashicorp/go-multierror"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"net"
-	"net/http"
-	"sync"
 )
 
 type Server struct {
