@@ -34,6 +34,10 @@ func (u *useCase) NotifyPending(ctx context.Context) error {
 
 	for current < total {
 		statuses, err := u.notifierOutboxRepo.GetPendingNotifications(ctx, current, batchSize)
+		if len(statuses) == 0 {
+			return nil
+		}
+
 		total = uint64(statuses[0].Total)
 		if err != nil {
 			return errors.Wrap(err, "fail get pending notifications")

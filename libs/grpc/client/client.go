@@ -12,7 +12,10 @@ type ClientConnection struct {
 
 func NewClientConnection(target string, opts ...grpc.DialOption) (*ClientConnection, error) {
 	optsAll := []grpc.DialOption{
-		grpc.WithChainUnaryInterceptor(MetricsInterceptor(), TraceInterceptor()),
+		grpc.WithChainUnaryInterceptor(
+			TraceInterceptor(),
+			MetricsInterceptor(),
+		),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 	optsAll = append(optsAll, opts...)

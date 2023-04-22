@@ -1,8 +1,9 @@
-token: "secret"
+token: "csdaKvoNMmWwIlPEgVX0gLpt"
 dsn: "host=pgbouncer-checkout port=6433 user=checkout password=password dbname=checkout-db sslmode=disable"
+#dsn: "host=localhost port=6433 user=checkout password=password dbname=checkout-db sslmode=disable"
 services:
-  checkout_grpc: ":8081"
-  checkout_http: ":7081"
+  checkout_grpc: "checkout:8081"
+  checkout_http: "checkout:7081"
   loms: "loms:8082"
   product_service: "route256.pavl.uk:8082"
   jaeger: "jaeger:6831"

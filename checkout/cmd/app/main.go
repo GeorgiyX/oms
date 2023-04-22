@@ -71,9 +71,9 @@ func main() {
 	useCaseInstance := checkout2.New(useCaseConfig)
 	serviceInstance := checkout.New(useCaseInstance)
 
-	server, err := grpcServer.NewServer("checkout", grpc.ChainUnaryInterceptor(
-		middleware.LoggingInterceptor(lg),
-	))
+	server, err := grpcServer.NewServer("checkout", config.Instance.Services.Jaeger,
+		grpc.ChainUnaryInterceptor(middleware.LoggingInterceptor(lg)),
+	)
 	if err != nil {
 		logger.Fatal("create server", zap.Error(err))
 	}

@@ -8,6 +8,8 @@ services:
       - "7081:7081"
     volumes:
       - ./checkout:/checkout # for config read
+    environment:
+      CONFIG: checkout/config.compose.yaml
     networks:
       - net
     depends_on:
@@ -51,8 +53,11 @@ services:
     build: ./loms/
     ports:
       - "8082:8082"
+      - "7082:7082"
     volumes:
       - ./loms:/loms  # for config read
+    environment:
+      CONFIG: loms/config.compose.yaml
     networks:
       - net
     depends_on:
@@ -94,11 +99,11 @@ services:
 
   notification:
     image: notification
-    build: ./notification
+    build: ./notifications
     networks:
       - net
     ports:
-     - "8082:8082"
+     - "8083:8083"
     volumes:
       - ./notifications:/notifications # for config read
     depends_on:
@@ -209,6 +214,8 @@ services:
       - 16686:16686 # web
       - 14268:14268
       - 9411:9411
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
 
 
 volumes:

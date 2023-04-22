@@ -17,8 +17,8 @@ type Server struct {
 	grpcServer *grpc.Server
 }
 
-func NewServer(serverName string, optIn ...grpc.ServerOption) (*Server, error) {
-	err := initTracing(serverName)
+func NewServer(serverName, jaegerReporter string, optIn ...grpc.ServerOption) (*Server, error) {
+	err := initTracing(serverName, jaegerReporter)
 	if err != nil {
 		return nil, errors.Wrap(err, "init tracing")
 	}

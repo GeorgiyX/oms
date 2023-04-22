@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
+
 	"route256/libs/cron"
 	"route256/libs/db"
 	grpcServer "route256/libs/grpc/server"
@@ -12,13 +16,11 @@ import (
 	"route256/loms/internal/app/loms"
 	"route256/loms/internal/config"
 	"route256/loms/internal/notifier"
+	notificationOutbox "route256/loms/internal/repositories/notification_outbox"
 	"route256/loms/internal/repositories/order"
 	"route256/loms/internal/repositories/warehouse"
 	loms2 "route256/loms/internal/usecase/loms"
 	desc "route256/loms/pkg/loms"
-
-	"github.com/jackc/pgx/v4/pgxpool"
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -48,6 +50,7 @@ func main() {
 		loms2.Config{
 			WarehouseRepository: warehouse.New(txDB),
 			OrderRepository:     order.New(txDB),
+			NotifierOutboxRepo:  notificationOutbox.New(txDB),
 			Notifier:            nil,
 			TxDB:                txDB,
 		},
@@ -66,9 +69,9 @@ func main() {
 	c.Add(useCaseInstance.GetCancelOrdersByTimeoutCron())
 	c.Add(useCaseInstance.GetNotifyCron())
 
-	server, err := grpcServer.NewServer("loms", grpc.ChainUnaryInterceptor(
-		middleware.LoggingInterceptor(lg),
-	))
+	server, err := grpcServer.NewServer("loms", config.Instance.Services.Jaeger, grpc.ChainUnaryInterceptor(
+		middleware.LoggingInterceptor(lg)),
+	)
 	if err != nil {
 		logger.Fatal("create server", zap.Error(err))
 	}

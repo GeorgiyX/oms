@@ -39,6 +39,7 @@ func NewAsyncProducer(cfg ConfigProducer) (*asyncProducer, error) {
 	config.Producer.Idempotent = true                // exactly once
 	config.Producer.Return.Successes = true
 	config.Producer.Return.Errors = true
+	config.Net.MaxOpenRequests = 1 // exactly once
 
 	cfg.SuccessCallBack = wrapSuccessCallBack(cfg.SuccessCallBack)
 	cfg.ErrorCallBack = wrapErrorCallBack(cfg.ErrorCallBack)

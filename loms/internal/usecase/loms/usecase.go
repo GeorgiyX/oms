@@ -37,15 +37,17 @@ type useCase struct {
 type Config struct {
 	WarehouseRepository warehouse.Repository
 	OrderRepository     order.Repository
+	NotifierOutboxRepo  notificationOutbox.Repository
 	Notifier            notifier.Notifier
 	TxDB                db.TxDB
 }
 
 func New(config Config) *useCase {
 	return &useCase{
-		warehouseRepo: config.WarehouseRepository,
-		orderRepo:     config.OrderRepository,
-		notifier:      config.Notifier,
-		db:            config.TxDB,
+		warehouseRepo:      config.WarehouseRepository,
+		orderRepo:          config.OrderRepository,
+		notifierOutboxRepo: config.NotifierOutboxRepo,
+		notifier:           config.Notifier,
+		db:                 config.TxDB,
 	}
 }
