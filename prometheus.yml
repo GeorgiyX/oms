@@ -11,9 +11,9 @@ scrape_configs:
   - job_name: "prometheus"
     static_configs:
       - targets: ["loms:7082", "checkout:7081"]
-  - job_name: "app"
-    static_configs:
-      - targets: 
-        - "host.docker.internal:8080"
-        # - "host.docker.internal:8081"
- 
+
+alerting:
+  alertmanagers:
+    - scheme: http
+      static_configs:
+        - targets: ["alertmanager:9093"]

@@ -1,0 +1,14 @@
+route:
+    group_by: [alerts]
+    receiver: telegram
+    repeat_interval: 30m
+    group_interval: 1s
+
+receivers:
+  - name: 'telegram'
+    telegram_configs:
+      - bot_token: TOKEN
+        api_url: https://api.telegram.org
+        chat_id: CHAT_ID
+        message: '⚠ Alarm! {{index .CommonAnnotations "description"}}'
+        parse_mode: ''

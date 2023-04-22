@@ -3,9 +3,17 @@ groups:
   rules:
   - alert: TargetIsDown
     expr: up == 0
-    for: 30s
+    for: 2s
     labels:
-      severity: medium
+      severity: high
     annotations:
-      summary: "The target {{ $labels.job }} is down"
-      description: "Instance {{ $labels.instance }} of job {{ $labels.job }} has been down for more than 30 seconds."
+      summary: "The target {{ $labels.instance }} is down"
+      description: "Instance {{ $labels.instance }} has been down for more than 15 seconds."
+  - alert: HighErrorRate
+    expr: sum(rate(homework_grpc_histogram_server_response_time_seconds_bucket{status!="OK"}[10s])) by (method, instance) > 5
+    for: 5s
+    labels:
+      severity: high
+    annotations:
+      summary: "High error rate at service {{ $labels.instance }}"
+      description: "Error rate at {{ $labels.method }} - {{ $value }} rps more than 5s. Service: {{ $labels.instance }}."
