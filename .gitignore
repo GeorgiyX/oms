@@ -5,3 +5,4 @@ vendor-proto/
 generate/
 .obsidian/
 coverage.out
+load.sh
