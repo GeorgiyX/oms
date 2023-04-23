@@ -84,10 +84,16 @@ func (c *cache[T]) Get(ctx context.Context, key string, fn func(context.Context)
 		bucket.Lock()
 	}
 
+	// set element position at LRU linked list
+	// buket.head - most resent used element, buket.tail - least resent used
 	if !ok {
 		// check is bucket has free space
-		if uint64(len(bucket.data)) > c.bucketSize {
-			bucket.removeOne(now)
+		if uint64(len(bucket.data)) >= c.bucketSize {
+			err := bucket.removeOne(now)
+			if err != nil {
+				bucket.Unlock()
+				return nil, err
+			}
 		}
 
 		element = &bucketElement[T]{
@@ -97,10 +103,16 @@ func (c *cache[T]) Get(ctx context.Context, key string, fn func(context.Context)
 		}
 
 		// add new element as head
-		bucket.head.next = element
-		element.prev = bucket.head
+		if bucket.head != nil {
+			bucket.head.next = element
+			element.prev = bucket.head
+		}
 		bucket.head = element
 		bucket.data[key] = element
+
+		if bucket.tail == nil {
+			bucket.tail = element
+		}
 	} else if element != bucket.head {
 		// detach from curr position
 		element.next.prev = element.prev
@@ -129,7 +141,11 @@ func (c *cache[T]) Get(ctx context.Context, key string, fn func(context.Context)
 // removeOne remove one expired LRU element.
 // If expired element not found - remove first LRU.
 // Assume that mutex RLock called.
-func (b *cacheBucket[T]) removeOne(now int64) {
+func (b *cacheBucket[T]) removeOne(now int64) error {
+	if b.tail == nil || b.head == nil || len(b.data) == 0 {
+		return errors.New("incorrect cache size configuration")
+	}
+
 	curr := b.tail
 	for curr != nil && curr.expiredAt > now {
 		curr = curr.next
@@ -140,11 +156,25 @@ func (b *cacheBucket[T]) removeOne(now int64) {
 		b.tail = b.tail.next
 		b.tail.prev = nil
 		delete(b.data, lruKey)
-		return
+		return nil
 	}
 
 	// remove expired
-	curr.next.prev = curr.prev
-	curr.prev.next = curr.next
+	if curr.next != nil {
+		curr.next.prev = curr.prev
+	}
+
+	if curr.prev != nil {
+		curr.prev.next = curr.next
+	}
+
+	if curr == b.head {
+		b.head = curr.prev
+	}
+
+	if curr == b.tail {
+		b.tail = curr.next
+	}
 	delete(b.data, curr.key)
+	return nil
 }
