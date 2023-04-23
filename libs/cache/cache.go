@@ -54,7 +54,7 @@ func New[T any](config Config) (Cache[T], error) {
 		return nil, errors.New("zero bucket count in config")
 	}
 
-	if config.Size == 0 {
+	if config.Size < config.BucketCount {
 		return nil, errors.New("zero cache size count in config")
 	}
 
