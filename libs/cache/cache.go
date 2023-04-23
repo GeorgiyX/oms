@@ -65,8 +65,18 @@ func New[T any](config Config) (Cache[T], error) {
 	}, nil
 }
 
+func wrapGetFuncWithMetrics[T any](cacheName string, fn GetFunc[T]) GetFunc[T] {
+	return func(ctx context.Context) (*T, error) {
+		missCounter.WithLabelValues(cacheName).Inc()
+		exitCountRtFn := countRtFn(cacheName)
+		defer exitCountRtFn()
+		return fn(ctx)
+	}
+}
+
 // Get return cached T by key. If key not found or TTL expired - call fn and save returned value in cache.
 func (c *cache[T]) Get(ctx context.Context, key string, fn GetFunc[T]) (*T, error) {
+	fn = wrapGetFuncWithMetrics(c.config.Name, fn)
 	requestCounter.WithLabelValues(c.config.Name).Inc()
 	exitCountRtCache := countRtCache(c.config.Name)
 	defer exitCountRtCache()
@@ -92,10 +102,6 @@ func (c *cache[T]) Get(ctx context.Context, key string, fn GetFunc[T]) (*T, erro
 	var value *T
 	if !ok || element.expiredAt <= now { // request actual value if key not found or value expired
 		bucket.Unlock() // allow edit bucket while request actual value via fn()
-
-		missCounter.WithLabelValues(c.config.Name).Inc()
-		exitCountRtFn := countRtFn(c.config.Name)
-		defer exitCountRtFn()
 
 		var err error
 		value, err = fn(ctx)
