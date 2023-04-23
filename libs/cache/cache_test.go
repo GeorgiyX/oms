@@ -2,12 +2,13 @@ package cache
 
 import (
 	"context"
-	"github.com/brianvoe/gofakeit/v6"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/require"
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/require"
 )
 
 var someNum = int64(42)

@@ -2,16 +2,19 @@ package cache
 
 import (
 	"context"
-	"github.com/cespare/xxhash"
-	"github.com/pkg/errors"
 	"sync"
 	"time"
+
+	"github.com/cespare/xxhash"
+	"github.com/pkg/errors"
 )
 
 var _ Cache[int64] = (*cache[int64])(nil)
 
+type GetFunc[T any] func(context.Context) (*T, error)
+
 type Cache[T any] interface {
-	Get(ctx context.Context, key string, fn func(context.Context) (*T, error)) (*T, error)
+	Get(ctx context.Context, key string, fn GetFunc[T]) (*T, error)
 }
 
 // bucketElement represent cached value with metadata
@@ -63,7 +66,7 @@ func New[T any](config Config) (Cache[T], error) {
 }
 
 // Get return cached T by key. If key not found or TTL expired - call fn and save returned value in cache.
-func (c *cache[T]) Get(ctx context.Context, key string, fn func(context.Context) (*T, error)) (*T, error) {
+func (c *cache[T]) Get(ctx context.Context, key string, fn GetFunc[T]) (*T, error) {
 	requestCounter.WithLabelValues(c.config.Name).Inc()
 	exitCountRtCache := countRtCache(c.config.Name)
 	defer exitCountRtCache()

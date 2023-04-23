@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"route256/checkout/internal/model"
+	"route256/libs/cache"
+	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
@@ -62,10 +65,19 @@ func main() {
 	}
 	defer connLoms.Close()
 	productServiceClient := descProductService.NewProductServiceClient(connProduct)
+	productServiceCache, err := cache.New[model.Product](cache.Config{
+		Size:        1000,
+		BucketCount: 32,
+		TTL:         time.Minute * 10,
+		Name:        "checkout_product_service_cache",
+	})
+	if err != nil {
+		logger.Fatal("failed to create cache", zap.Error(err))
+	}
 
 	useCaseConfig := checkout2.Config{
 		StocksChecker: loms.New(lomsClient),
-		SkuResolver:   productService.New(productServiceClient),
+		SkuResolver:   productService.New(productServiceClient, productServiceCache),
 		Repository:    cart.New(txDB),
 	}
 	useCaseInstance := checkout2.New(useCaseConfig)
