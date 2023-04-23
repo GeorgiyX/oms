@@ -45,12 +45,20 @@ type Config struct {
 	ttl         time.Duration
 }
 
-func New[T any](config Config) Cache[T] {
+func New[T any](config Config) (Cache[T], error) {
+	if config.bucketCount == 0 {
+		return nil, errors.New("zero bucket count in config")
+	}
+
+	if config.size == 0 {
+		return nil, errors.New("zero cache size count in config")
+	}
+
 	return &cache[T]{
 		buckets:    make([]*cacheBucket[T], config.bucketCount),
 		config:     config,
 		bucketSize: config.size / config.bucketCount,
-	}
+	}, nil
 }
 
 // Get return cached T by key. If key not found or TTL expired - call fn and save returned value in cache.
@@ -153,8 +161,15 @@ func (b *cacheBucket[T]) removeOne(now int64) error {
 
 	if curr == nil { // expired element not found, remove LRU
 		lruKey := b.tail.key
-		b.tail = b.tail.next
-		b.tail.prev = nil
+
+		if b.tail == b.head {
+			b.head = nil
+			b.tail = nil
+		} else {
+			b.tail = b.tail.next
+			b.tail.prev = nil
+		}
+
 		delete(b.data, lruKey)
 		return nil
 	}
