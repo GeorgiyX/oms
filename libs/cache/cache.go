@@ -14,6 +14,7 @@ type Cache[T any] interface {
 	Get(ctx context.Context, key string, fn func(context.Context) (*T, error)) (*T, error)
 }
 
+// bucketElement represent cached value with metadata
 type bucketElement[T any] struct {
 	value     *T
 	key       string
@@ -22,6 +23,8 @@ type bucketElement[T any] struct {
 	prev      *bucketElement[T]
 }
 
+// cacheBucket represent shard of cache.
+// head, tail - part of linked list for LRU algorithm
 type cacheBucket[T any] struct {
 	sync.RWMutex
 	data map[string]*bucketElement[T]
@@ -30,6 +33,7 @@ type cacheBucket[T any] struct {
 }
 
 type cache[T any] struct {
+	sync.Mutex
 	buckets    []*cacheBucket[T]
 	config     Config
 	bucketSize uint64
@@ -43,68 +47,79 @@ type Config struct {
 
 func New[T any](config Config) Cache[T] {
 	return &cache[T]{
-		buckets:    make([]*cacheBucket[T], 0, config.bucketCount),
+		buckets:    make([]*cacheBucket[T], config.bucketCount),
 		config:     config,
 		bucketSize: config.size / config.bucketCount,
 	}
 }
 
-// Get return cachet T by key. If key not found or TTL expired - call fn and save returned value in cache.
+// Get return cached T by key. If key not found or TTL expired - call fn and save returned value in cache.
 func (c *cache[T]) Get(ctx context.Context, key string, fn func(context.Context) (*T, error)) (*T, error) {
+	c.Lock()
 	bucketNum := xxhash.Sum64String(key) % c.config.bucketCount
 	bucket := c.buckets[bucketNum]
+	if bucket == nil { // allocate bucket on first access
+		bucket = &cacheBucket[T]{
+			RWMutex: sync.RWMutex{},
+			data:    make(map[string]*bucketElement[T], c.bucketSize),
+			head:    nil,
+			tail:    nil,
+		}
+		c.buckets[bucketNum] = bucket
+	}
+	c.Unlock()
 
 	bucket.Lock()
-	if bucket.data == nil {
-		bucket.data = make(map[string]*bucketElement[T], c.bucketSize)
-	}
-
 	now := time.Now().Unix()
 	element, ok := bucket.data[key]
 
 	var value *T
-	if !ok || element.expiredAt <= now {
+	if !ok || element.expiredAt <= now { // request actual value if key not found or value expired
 		bucket.Unlock() // allow edit bucket while request actual value via fn()
 		var err error
 		value, err = fn(ctx)
 		if err != nil {
 			return nil, errors.Wrap(err, "call fn in cache Get")
 		}
-
-		element.value = value
-		element.expiredAt = now + int64(c.config.ttl)
+		bucket.Lock()
 	}
 
-	bucket.Lock()
 	if !ok {
+		// check is bucket has free space
+		if uint64(len(bucket.data)) > c.bucketSize {
+			bucket.removeOne(now)
+		}
+
 		element = &bucketElement[T]{
 			key:       key,
 			value:     value,
-			expiredAt: now,
+			expiredAt: now + int64(c.config.ttl),
 		}
 
 		// add new element as head
 		bucket.head.next = element
 		element.prev = bucket.head
 		bucket.head = element
-
-		// check is bucket has free space
-		if uint64(len(bucket.data)) > c.bucketSize {
-			bucket.removeOne(now)
-		}
+		bucket.data[key] = element
 	} else if element != bucket.head {
 		// detach from curr position
 		element.next.prev = element.prev
 		if element.prev != nil {
 			element.prev.next = element.next
+		} else {
+			bucket.tail = element.next
 		}
 
 		// attach as head
 		bucket.head.next = element
 		element.prev = bucket.head
 		element.next = nil
-		element.expiredAt = now
 		bucket.head = element
+	}
+
+	if ok && element.expiredAt <= now {
+		element.value = value
+		element.expiredAt = now + int64(c.config.ttl)
 	}
 
 	bucket.Unlock()
