@@ -4,14 +4,14 @@ package product_service
 
 import (
 	"context"
+	"strconv"
+
+	"github.com/pkg/errors"
 	"route256/checkout/internal/config"
 	"route256/checkout/internal/convert"
 	"route256/checkout/internal/model"
 	desc "route256/checkout/pkg/product-service"
 	"route256/libs/cache"
-	"strconv"
-
-	"github.com/pkg/errors"
 )
 
 var _ SkuResolver = (*clientSkuResolver)(nil)

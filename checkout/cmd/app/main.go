@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"route256/checkout/internal/model"
-	"route256/libs/cache"
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -15,10 +13,12 @@ import (
 	"route256/checkout/internal/clients/loms"
 	productService "route256/checkout/internal/clients/product_service"
 	"route256/checkout/internal/config"
+	"route256/checkout/internal/model"
 	"route256/checkout/internal/repositories/cart"
 	checkout2 "route256/checkout/internal/usecases/checkout"
 	desc "route256/checkout/pkg/checkout"
 	descProductService "route256/checkout/pkg/product-service"
+	"route256/libs/cache"
 	"route256/libs/db"
 	grpcClient "route256/libs/grpc/client"
 	grpcServer "route256/libs/grpc/server"
