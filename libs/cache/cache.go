@@ -29,7 +29,7 @@ type bucketElement[T any] struct {
 // cacheBucket represent shard of cache.
 // head, tail - part of linked list for LRU algorithm
 type cacheBucket[T any] struct {
-	sync.RWMutex
+	sync.Mutex
 	data map[string]*bucketElement[T]
 	head *bucketElement[T]
 	tail *bucketElement[T]
@@ -76,10 +76,10 @@ func (c *cache[T]) Get(ctx context.Context, key string, fn GetFunc[T]) (*T, erro
 	bucket := c.buckets[bucketNum]
 	if bucket == nil { // allocate bucket on first access
 		bucket = &cacheBucket[T]{
-			RWMutex: sync.RWMutex{},
-			data:    make(map[string]*bucketElement[T], c.bucketSize),
-			head:    nil,
-			tail:    nil,
+			Mutex: sync.Mutex{},
+			data:  make(map[string]*bucketElement[T], c.bucketSize),
+			head:  nil,
+			tail:  nil,
 		}
 		c.buckets[bucketNum] = bucket
 	}
