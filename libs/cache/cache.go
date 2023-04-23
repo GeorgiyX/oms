@@ -40,31 +40,36 @@ type cache[T any] struct {
 }
 
 type Config struct {
-	size        uint64 // total elements in cache
-	bucketCount uint64
-	ttl         time.Duration
+	Size        uint64 // total elements in cache
+	BucketCount uint64
+	TTL         time.Duration
+	Name        string
 }
 
 func New[T any](config Config) (Cache[T], error) {
-	if config.bucketCount == 0 {
+	if config.BucketCount == 0 {
 		return nil, errors.New("zero bucket count in config")
 	}
 
-	if config.size == 0 {
+	if config.Size == 0 {
 		return nil, errors.New("zero cache size count in config")
 	}
 
 	return &cache[T]{
-		buckets:    make([]*cacheBucket[T], config.bucketCount),
+		buckets:    make([]*cacheBucket[T], config.BucketCount),
 		config:     config,
-		bucketSize: config.size / config.bucketCount,
+		bucketSize: config.Size / config.BucketCount,
 	}, nil
 }
 
 // Get return cached T by key. If key not found or TTL expired - call fn and save returned value in cache.
 func (c *cache[T]) Get(ctx context.Context, key string, fn func(context.Context) (*T, error)) (*T, error) {
+	requestCounter.WithLabelValues(c.config.Name).Inc()
+	exitCountRtCache := countRtCache(c.config.Name)
+	defer exitCountRtCache()
+
 	c.Lock()
-	bucketNum := xxhash.Sum64String(key) % c.config.bucketCount
+	bucketNum := xxhash.Sum64String(key) % c.config.BucketCount
 	bucket := c.buckets[bucketNum]
 	if bucket == nil { // allocate bucket on first access
 		bucket = &cacheBucket[T]{
@@ -84,11 +89,17 @@ func (c *cache[T]) Get(ctx context.Context, key string, fn func(context.Context)
 	var value *T
 	if !ok || element.expiredAt <= now { // request actual value if key not found or value expired
 		bucket.Unlock() // allow edit bucket while request actual value via fn()
+
+		missCounter.WithLabelValues(c.config.Name).Inc()
+		exitCountRtFn := countRtFn(c.config.Name)
+		defer exitCountRtFn()
+
 		var err error
 		value, err = fn(ctx)
 		if err != nil {
 			return nil, errors.Wrap(err, "call fn in cache Get")
 		}
+
 		bucket.Lock()
 	}
 
@@ -107,7 +118,7 @@ func (c *cache[T]) Get(ctx context.Context, key string, fn func(context.Context)
 		element = &bucketElement[T]{
 			key:       key,
 			value:     value,
-			expiredAt: now + int64(c.config.ttl),
+			expiredAt: now + int64(c.config.TTL),
 		}
 
 		// add new element as head
@@ -139,7 +150,7 @@ func (c *cache[T]) Get(ctx context.Context, key string, fn func(context.Context)
 
 	if ok && element.expiredAt <= now {
 		element.value = value
-		element.expiredAt = now + int64(c.config.ttl)
+		element.expiredAt = now + int64(c.config.TTL)
 	}
 
 	bucket.Unlock()

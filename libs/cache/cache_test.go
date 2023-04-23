@@ -27,9 +27,9 @@ func TestCache(t *testing.T) {
 	ctx := context.Background()
 	t.Run("should correct store elements", func(t *testing.T) {
 		c, err := New[int64](Config{
-			size:        10,
-			bucketCount: 2,
-			ttl:         time.Minute,
+			Size:        10,
+			BucketCount: 2,
+			TTL:         time.Minute,
 		})
 		require.NoError(t, err)
 
@@ -58,9 +58,9 @@ func TestCache(t *testing.T) {
 
 	t.Run("should replace LRU if cache full", func(t *testing.T) {
 		c, err := New[int64](Config{
-			size:        1,
-			bucketCount: 1,
-			ttl:         time.Minute,
+			Size:        1,
+			BucketCount: 1,
+			TTL:         time.Minute,
 		})
 		require.NoError(t, err)
 
@@ -89,9 +89,9 @@ func TestCache(t *testing.T) {
 
 	t.Run("should refresh value if value expired", func(t *testing.T) {
 		c, err := New[int64](Config{
-			size:        10,
-			bucketCount: 2,
-			ttl:         0,
+			Size:        10,
+			BucketCount: 2,
+			TTL:         0,
 		})
 		require.NoError(t, err)
 
@@ -115,9 +115,9 @@ func TestCache(t *testing.T) {
 
 	t.Run("should return err if refresh value fail", func(t *testing.T) {
 		c, err := New[int64](Config{
-			size:        10,
-			bucketCount: 2,
-			ttl:         -time.Minute,
+			Size:        10,
+			BucketCount: 2,
+			TTL:         -time.Minute,
 		})
 		require.NoError(t, err)
 
