@@ -23,14 +23,9 @@ func (r *notificationOutbox) GetPendingNotifications(ctx context.Context, offset
 func (r *notificationOutbox) ScheduleNotification(ctx context.Context, orderID int64, status model.OrderStatus) error {
 	const query = `INSERT INTO notification_outbox (fk_order_info_id, created_at, send_status, notification_status) VALUES ($1, DEFAULT, $2, $3);`
 
-	resp, err := r.db.Exec(ctx, query, orderID, model.WaitConfirmationNotificationStatus, status)
+	_, err := r.db.Exec(ctx, query, orderID, model.WaitConfirmationNotificationStatus, status)
 	if err != nil {
 		return errors.Wrap(err, "cannot schedule notification")
-	}
-
-	affected := resp.RowsAffected()
-	if affected != 1 {
-		return errors.New("nothing inserted to notification_outbox")
 	}
 
 	return nil

@@ -2,7 +2,8 @@ package kafka
 
 import (
 	"context"
-	"log"
+	"go.uber.org/zap"
+	"route256/libs/logger"
 	"sync"
 
 	"github.com/Shopify/sarama"
@@ -73,7 +74,7 @@ func NewConsumerGroup(cfg ConfigConsumer) (*consumerGroup, error) {
 		for {
 			errIn := client.Consume(ctx, cfg.Brokers, &c) // start consume session
 			if errIn != nil {
-				log.Print("err while call client.Consume")
+				logger.Error("err while call client.Consume", zap.Error(err))
 			}
 
 			if ctx.Err() != nil { // check if context was cancelled
@@ -84,7 +85,7 @@ func NewConsumerGroup(cfg ConfigConsumer) (*consumerGroup, error) {
 	}()
 
 	<-c.ready // await till the consumer has been set up
-	log.Println("Sarama consumer up and running!...")
+	logger.Info("Sarama consumer up and running!...")
 
 	return cg, nil
 }
@@ -103,7 +104,7 @@ func (c *consumerGroup) Cancel() (err error) {
 func wrapNil(fn MessageHandler) MessageHandler {
 	return func(ctx context.Context, message *sarama.ConsumerMessage) error {
 		if fn == nil {
-			log.Println("new message, no handler")
+			logger.Info("new message, no handler")
 			return nil
 		}
 		return fn(ctx, message)

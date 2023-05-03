@@ -9,8 +9,8 @@ import (
 	"route256/libs/ratelimiter"
 )
 
-var withRateLimit map[string]struct{} = map[string]struct{}{
-	"/route256.product.ProductService/GetProduct": struct{}{},
+var withRateLimit = map[string]struct{}{
+	"/route256.product.ProductService/GetProduct": {},
 }
 
 // RateLimiterInterceptor call method with rate limit check

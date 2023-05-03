@@ -2,7 +2,8 @@ package kafka
 
 import (
 	"context"
-	"log"
+	"go.uber.org/zap"
+	"route256/libs/logger"
 
 	"github.com/Shopify/sarama"
 	"github.com/pkg/errors"
@@ -38,6 +39,7 @@ func NewAsyncProducer(cfg ConfigProducer) (*asyncProducer, error) {
 	config.Producer.Idempotent = true                // exactly once
 	config.Producer.Return.Successes = true
 	config.Producer.Return.Errors = true
+	config.Net.MaxOpenRequests = 1 // exactly once
 
 	cfg.SuccessCallBack = wrapSuccessCallBack(cfg.SuccessCallBack)
 	cfg.ErrorCallBack = wrapErrorCallBack(cfg.ErrorCallBack)
@@ -88,18 +90,31 @@ func (a *asyncProducer) Close() error {
 
 func logSendErr(message *sarama.ProducerMessage, err error) {
 	key, _ := message.Key.Encode()
-	log.Printf("Message send error: timestamp = %v, key = %s, err = %s, topic = %s, partition = %s, offset = %s", message.Timestamp, string(key), err.Error(), message.Topic, message.Partition, message.Offset)
+	logger.Error("Message send error",
+		zap.Error(err),
+		zap.Time("time_stamp", message.Timestamp),
+		zap.ByteString("key", key),
+		zap.String("topic", message.Topic),
+		zap.Int32("partition", message.Partition),
+		zap.Int64("offset", message.Offset),
+	)
 }
 
 func logSend(message *sarama.ProducerMessage) {
 	key, _ := message.Key.Encode()
-	log.Printf("Message send: timestamp = %v, key = %s, topic = %s, partition = %s, offset = %s", message.Timestamp, string(key), message.Topic, message.Partition, message.Offset)
+	logger.Error("Message send OK",
+		zap.Time("time_stamp", message.Timestamp),
+		zap.ByteString("key", key),
+		zap.String("topic", message.Topic),
+		zap.Int32("partition", message.Partition),
+		zap.Int64("offset", message.Offset),
+	)
 }
 
 func wrapErrorCallBack(fn ErrorCallBack) ErrorCallBack {
 	return func(ctx context.Context, message *sarama.ProducerMessage, err error) {
 		if fn == nil {
-			log.Println("err happen, no err handler")
+			logger.Error("err happen, no err handler", zap.Error(err))
 		}
 		fn(ctx, message, err)
 	}
@@ -108,7 +123,7 @@ func wrapErrorCallBack(fn ErrorCallBack) ErrorCallBack {
 func wrapSuccessCallBack(fn SuccessCallBack) SuccessCallBack {
 	return func(ctx context.Context, message *sarama.ProducerMessage) {
 		if fn == nil {
-			log.Println("message send, no success handler")
+			logger.Info("message send, no success handler")
 		}
 		fn(ctx, message)
 	}

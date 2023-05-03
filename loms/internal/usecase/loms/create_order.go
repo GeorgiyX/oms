@@ -58,7 +58,7 @@ func (u *useCase) CreateOrder(ctx context.Context, user int64, items []model.Ord
 			return errors.Wrap(err, "set order status")
 		}
 
-		err = u.notifierOutboxRepo.ScheduleNotification(ctx, orderID, status)
+		err = u.notifierOutboxRepo.ScheduleNotification(ctxTx, orderID, status)
 		if err != nil {
 			return errors.Wrap(err, "schedule notification")
 		}

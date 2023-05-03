@@ -5,8 +5,11 @@ services:
     build: ./checkout/
     ports:
       - "8081:8081"
+      - "7081:7081"
     volumes:
       - ./checkout:/checkout # for config read
+    environment:
+      CONFIG: checkout/config.compose.yaml
     networks:
       - net
     depends_on:
@@ -50,8 +53,11 @@ services:
     build: ./loms/
     ports:
       - "8082:8082"
+      - "7082:7082"
     volumes:
       - ./loms:/loms  # for config read
+    environment:
+      CONFIG: loms/config.compose.yaml
     networks:
       - net
     depends_on:
@@ -93,11 +99,11 @@ services:
 
   notification:
     image: notification
-    build: ./notification
+    build: ./notifications
     networks:
       - net
     ports:
-     - "8082:8082"
+     - "8083:8083"
     volumes:
       - ./notifications:/notifications # for config read
     depends_on:
@@ -173,6 +179,54 @@ services:
     depends_on:
       - kafka1
       - kafka2
+
+  prometheus:
+    image: prom/prometheus
+    networks:
+      - net
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alerts.yml:/etc/prometheus/alerts.yml
+
+  alertmanager:
+    image: prom/alertmanager
+#    restart: unless-stopped
+    networks:
+      - net
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager.yml:/alertmanager.yml
+    command: --config.file=/alertmanager.yml --log.level=debug
+
+  grafana:
+    image: grafana/grafana-oss
+    networks:
+      - net
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data:/var/lib/grafana
+    links:
+      - prometheus
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.18
+    networks:
+      - net
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686 # web
+      - 14268:14268
+      - 9411:9411
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
 
 volumes:
   db-data-checkout:

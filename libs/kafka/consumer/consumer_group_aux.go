@@ -1,7 +1,8 @@
 package kafka
 
 import (
-	"log"
+	"go.uber.org/zap"
+	"route256/libs/logger"
 
 	"github.com/Shopify/sarama"
 )
@@ -47,5 +48,5 @@ func (c *consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim saram
 }
 
 func logMessageClaim(message *sarama.ConsumerMessage) {
-	log.Printf("Message claimed: timestamp = %v, key = %s, topic = %s", message.Timestamp, string(message.Key), message.Topic)
+	logger.Info("Message claimed", zap.Time("time_stamp", message.Timestamp), zap.ByteString("key", message.Key), zap.String("topic", message.Topic))
 }

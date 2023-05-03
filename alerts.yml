@@ -1,0 +1,19 @@
+groups:
+- name: alerts
+  rules:
+  - alert: TargetIsDown
+    expr: up == 0
+    for: 2s
+    labels:
+      severity: high
+    annotations:
+      summary: "The target {{ $labels.instance }} is down"
+      description: "Instance {{ $labels.instance }} has been down for more than 15 seconds."
+  - alert: HighErrorRate
+    expr: sum(rate(homework_grpc_histogram_server_response_time_seconds_bucket{status!="OK"}[10s])) by (method, instance) > 5
+    for: 5s
+    labels:
+      severity: high
+    annotations:
+      summary: "High error rate at service {{ $labels.instance }}"
+      description: "Error rate at {{ $labels.method }} - {{ $value }} rps more than 5s. Service: {{ $labels.instance }}."
