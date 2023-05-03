@@ -12,6 +12,9 @@ test:
 	go tool cover -func=coverage.out && \
 	rm coverage.out
 
+bench:
+	go test -benchmem -bench=. ./libs/cache/...
+
 precommit:
 	cd checkout && make precommit
 	cd loms && make precommit
