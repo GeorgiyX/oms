@@ -2,6 +2,8 @@ package cron
 
 import (
 	"context"
+	"go.uber.org/zap"
+	"route256/libs/logger"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -45,9 +47,16 @@ func New() *cron {
 	}
 }
 
+// Add TODO: cancel via context
 func (c *cron) Add(descriptor TaskDescriptor) {
 	c.wg.Add(1)
 	go func() {
+		defer func() {
+			r := recover()
+			if r != nil {
+				logger.Error("panic recover in cron", zap.Stack("stack"))
+			}
+		}()
 		defer c.wg.Done()
 		after := time.After(descriptor.Period)
 		for {
